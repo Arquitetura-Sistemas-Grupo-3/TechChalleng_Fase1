@@ -21,13 +21,12 @@ builder.Services.AddSwaggerGen();
 //builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 
 
-builder.Services.AddScoped<IJogoRepository, JogoRepository>();
-
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(configuration.GetConnectionString("Server=(localdb)\\MSSQLLocalDB;User ID=JULIANA\\_julia;Database=ProjetoTeste;Integrated Security=True;"));
 });
 
+builder.Services.AddScoped<IJogoRepository, JogoRepository>();
 builder.Services.AddScoped<ApplicationDbContext>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
