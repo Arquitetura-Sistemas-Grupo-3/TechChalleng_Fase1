@@ -13,7 +13,7 @@ namespace Infra.Repository
     {
         private readonly string _connectionString;
 
-        public ApplicationDbContext()
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
             IConfiguration configuration = new ConfigurationBuilder()
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
@@ -21,17 +21,8 @@ namespace Infra.Repository
                 .Build();
 
             _connectionString = configuration.GetConnectionString("DefaultConnection");
-        }   
-
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
-        {
         }
 
-        public ApplicationDbContext(string connectionString)
-        {
-            this._connectionString = connectionString;
-        }
-    
 
         public DbSet<Usuario> Usuario { get; set; }
 
@@ -43,7 +34,10 @@ namespace Infra.Repository
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;User ID=JULIANA\\_julia;Database=ProjetoTeste;Integrated Security=True;");
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlServer(_connectionString);
+            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

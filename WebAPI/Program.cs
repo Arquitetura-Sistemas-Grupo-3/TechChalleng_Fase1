@@ -17,14 +17,15 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
-//builder.Services.AddScoped<IUsuarioService, UsuarioService>();
-
+#region [DB]
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    options.UseSqlServer(configuration.GetConnectionString("Server=(localdb)\\MSSQLLocalDB;User ID=JULIANA\\_julia;Database=ProjetoTeste;Integrated Security=True;"));
+    options.UseSqlServer(connectionString);
 });
+#endregion
+
 
 builder.Services.AddScoped<IJogoRepository, JogoRepository>();
 builder.Services.AddScoped<ApplicationDbContext>();
