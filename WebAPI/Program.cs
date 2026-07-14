@@ -1,5 +1,10 @@
+using Core.Repository;
 using Infra.Repository;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Logging;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using WebAPI.Interface;
 using WebAPI.Respository;
 using WebAPI.Service;
@@ -23,14 +28,58 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(connectionString);
-});
+},ServiceLifetime.Scoped);
 #endregion
 
-
+#region [Injeção de Dependencia]
 builder.Services.AddScoped<IJogoRepository, JogoRepository>();
-builder.Services.AddScoped<ApplicationDbContext>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<INivelAcessoRepository, NivelAcessoRepository>();
+#endregion
+
+#region [Config JWT]
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = false,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+    };
+
+    //Ajuda a demonstrar qual foi o erro na tentativa de login
+    options.Events = new JwtBearerEvents
+    {
+        OnAuthenticationFailed = context =>
+        {
+            Console.WriteLine("### FALHA NA AUTENTICAÇÃO: " + context.Exception);
+            return Task.CompletedTask;
+        }
+    };
+});
+
+//Ajuda a demonstrar qual foi o erro na tentativa de login
+IdentityModelEventSource.ShowPII = true;
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
+});
+
+builder.Services.AddControllers();
+#endregion
 
 var app = builder.Build();
 

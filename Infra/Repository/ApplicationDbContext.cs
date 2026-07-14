@@ -11,9 +11,9 @@ namespace Infra.Repository
 {
     public class ApplicationDbContext : DbContext
     {
-        private readonly string _connectionString;
+       private readonly string _connectionString;
 
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+        public ApplicationDbContext()
         {
             IConfiguration configuration = new ConfigurationBuilder()
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
@@ -23,6 +23,10 @@ namespace Infra.Repository
             _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
+        public ApplicationDbContext(string connectionString)
+        {
+            _connectionString = connectionString;
+        }
 
         public DbSet<Usuario> Usuario { get; set; }
 

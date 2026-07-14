@@ -1,4 +1,5 @@
 ﻿using Core.Entidade;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,11 @@ namespace Infra.Repository
     {
         public UsuarioRepository(ApplicationDbContext applicationDb) : base(applicationDb)
         {
+        }
+
+        public async Task<Usuario?> ValidaEmailSenha(string email, string senha)
+        {
+            return await _dbSet.FirstOrDefaultAsync(u => u.Email == email && u.Senha == senha);
         }
     }
 }

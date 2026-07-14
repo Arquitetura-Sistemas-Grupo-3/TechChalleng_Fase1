@@ -9,5 +9,6 @@ namespace Core.Entidade
     public class NivelAcesso : BaseEntity
     {
         public string Nome { get; set; }
+        public ICollection<Usuario> Usuario { get; set; }
     }
 }

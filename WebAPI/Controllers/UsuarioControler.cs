@@ -63,7 +63,8 @@ namespace WebAPI.Controllers
                 {
                     Nome = usuarioInput.Nome,
                     Email = usuarioInput.Email,
-                    Senha = usuarioInput.Senha
+                    Senha = usuarioInput.Senha,
+                    NivelAcessoId = usuarioInput.NivelAcessoId
                 };
 
                 _usuarioRepository.Add(usuario);

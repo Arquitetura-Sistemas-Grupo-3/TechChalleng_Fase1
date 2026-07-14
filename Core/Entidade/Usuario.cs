@@ -13,8 +13,10 @@ namespace Core.Entidade
         public string Email { get; set; }
 
         public string Senha { get; set; }
+        public int NivelAcessoId { get; set; }
 
-        public ICollection<Jogo> Jogo{ get; set; }   
+        public ICollection<Jogo> Jogo{ get; set; }
+        public NivelAcesso NivelAcesso { get; set; }
 
     }
 }

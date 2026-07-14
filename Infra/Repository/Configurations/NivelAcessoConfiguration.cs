@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Infra.Repository.Configurations
 {
-    public class NiverAcessoConfiguration : IEntityTypeConfiguration<NivelAcesso>
+    public class NivelAcessoConfiguration : IEntityTypeConfiguration<NivelAcesso>
     {
         public void Configure(EntityTypeBuilder<NivelAcesso> builder)
         {
