@@ -17,6 +17,11 @@ namespace Infra.Repository.Configurations
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id).HasColumnType("INT").UseIdentityColumn();
             builder.Property(x => x.Nome).IsRequired().HasMaxLength(100);
+
+            builder.HasData(
+                new NivelAcesso {Id= 1 ,Nome = "Admin" },
+                new NivelAcesso {Id = 2,Nome = "Usuário" }
+                );
         }
     }
 }
