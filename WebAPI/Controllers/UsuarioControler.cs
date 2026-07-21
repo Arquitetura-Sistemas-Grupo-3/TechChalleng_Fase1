@@ -3,6 +3,7 @@ using Core.Input;
 using Infra.Repository;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.Interface;
+using WebAPI.Service;
 
 namespace WebAPI.Controllers
 {
@@ -59,16 +60,9 @@ namespace WebAPI.Controllers
         {
             try
             {
-                var usuario = new Usuario
-                {
-                    Nome = usuarioInput.Nome,
-                    Email = usuarioInput.Email,
-                    Senha = usuarioInput.Senha,
-                    NivelAcessoId = usuarioInput.NivelAcessoId
-                };
+                _usuarioService.AddUsuario(usuarioInput);
 
-                _usuarioRepository.Add(usuario);
-                return Ok();
+                return Created();
             }
             catch (Exception ex)
             {
