@@ -10,5 +10,6 @@ namespace Infra.Repository
 {
     public interface IUsuarioRepository : IRepository<Usuario>
     {
+        public Task<Usuario?> ValidaEmailSenha(string email, string senha);
     }
 }

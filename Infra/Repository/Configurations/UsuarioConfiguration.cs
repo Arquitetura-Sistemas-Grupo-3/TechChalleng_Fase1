@@ -19,6 +19,12 @@ namespace Infra.Repository.Configurations
             builder.Property(x => x.Nome).IsRequired().HasMaxLength(100);
             builder.Property(x => x.Email).IsRequired().HasMaxLength(100);
             builder.Property(x => x.Senha).IsRequired().HasMaxLength(100);
+            builder.Property(x => x.NivelAcessoId).HasColumnType("INT").IsRequired();
+
+            builder.HasOne(n => n.NivelAcesso)
+                .WithMany(u => u.Usuario)
+                .HasForeignKey(u => u.NivelAcessoId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

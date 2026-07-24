@@ -10,6 +10,6 @@ namespace Core.Entidade
     {
         public int Id { get; set; }
 
-        public DateTime Data { get; set; }
+        public DateTime Data { get; set; } =  DateTime.Now;
     }
 }
