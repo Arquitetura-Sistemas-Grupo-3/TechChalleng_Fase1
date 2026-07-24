@@ -14,9 +14,9 @@ namespace Infra.Repository
         {
         }
 
-        public async Task<Usuario?> ValidaEmailSenha(string email, string senha)
+        public async Task<Usuario?> ValidaEmailSenha(string email)
         {
-            return await _dbSet.FirstOrDefaultAsync(u => u.Email == email && u.Senha == senha);
+            return await _dbSet.FirstOrDefaultAsync(u => u.Email == email);
         }
     }
 }

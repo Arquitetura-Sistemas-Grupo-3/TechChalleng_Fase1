@@ -3,6 +3,7 @@ using Core.Input;
 using Infra.Repository;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.Interface;
+using WebAPI.Service;
 
 namespace WebAPI.Controllers
 {
@@ -10,13 +11,9 @@ namespace WebAPI.Controllers
     [Route("[controller]")]
     public class UsuarioControler : Controller
     {
-
-        private IUsuarioRepository _usuarioRepository;
         private IUsuarioService _usuarioService;
-        public UsuarioControler(IUsuarioRepository usuarioRepository, IUsuarioService usuarioService)
+        public UsuarioControler(IUsuarioService usuarioService)
         {
-
-            _usuarioRepository = usuarioRepository;
             _usuarioService = usuarioService;
         }
 
@@ -32,8 +29,6 @@ namespace WebAPI.Controllers
             {
                 return BadRequest(ex.Message);
             }
-            //var usuarios = await usuarioService.GetAll();
-            //return Ok(usuarios);
         }
 
         [HttpGet("{id}")]
@@ -41,11 +36,8 @@ namespace WebAPI.Controllers
         {
             try
             {
-                var usuario = await _usuarioRepository.GetById(id);
-                if (usuario == null)
-                {
-                    return NotFound();
-                }
+                var usuario = await _usuarioService.GetById(id);
+            
                 return Ok(usuario);
             }
             catch (Exception ex)
@@ -59,16 +51,9 @@ namespace WebAPI.Controllers
         {
             try
             {
-                var usuario = new Usuario
-                {
-                    Nome = usuarioInput.Nome,
-                    Email = usuarioInput.Email,
-                    Senha = usuarioInput.Senha,
-                    NivelAcessoId = usuarioInput.NivelAcessoId
-                };
+                var usuario = _usuarioService.AddUsuario(usuarioInput);
 
-                _usuarioRepository.Add(usuario);
-                return Ok();
+                return Ok(usuario);
             }
             catch (Exception ex)
             {
@@ -77,22 +62,29 @@ namespace WebAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update([FromBody] UsuarioUpdate usuarioUpdate)
+        public async Task<IActionResult> Update([FromBody] UsuarioUpdate usuarioUpdate)
         {
             try
             {
-                var usuario = new Usuario
-                {
-                    Id = usuarioUpdate.Id,
-                    Nome = usuarioUpdate.Nome,
-                    Email = usuarioUpdate.Email,
-                    Senha = usuarioUpdate.Senha
-                };
-                _usuarioRepository.Update(usuario);
-                return Ok();
+                var usuario = await _usuarioService.UpdateUsuario(usuarioUpdate);
+                return Ok(usuario);
             }
             catch (Exception e)
-            { 
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            try
+            {
+                var usuario = _usuarioService.DeleteUsuario(id);
+                return Ok(usuario);
+            }
+            catch (Exception e)
+            {
                 return BadRequest(e.Message);
             }
         }

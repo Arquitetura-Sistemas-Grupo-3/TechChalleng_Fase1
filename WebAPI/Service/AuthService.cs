@@ -1,4 +1,5 @@
-﻿using Core.Entidade;
+﻿using BC = BCrypt.Net.BCrypt;
+using Core.Entidade;
 using Core.Output;
 using Core.Repository;
 using Infra.Repository;
@@ -26,9 +27,12 @@ namespace WebAPI.Service
 
         public async Task<AuthReturn?> Login(string email, string senha)
         {
-            Usuario? usuario = await _usuarioRepository.ValidaEmailSenha(email, senha);
+
+            Usuario? usuario = await _usuarioRepository.ValidaEmailSenha(email);         
 
             if (usuario == null) return null;
+
+            if (!BC.Verify(senha, usuario.Senha)) return null;
 
             NivelAcesso acesso = await _nivelAcessoRepository.GetById(usuario.NivelAcessoId);
 
