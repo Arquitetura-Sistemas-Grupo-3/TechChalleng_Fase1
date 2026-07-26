@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using WebAPI.Interface;
+using WebAPI.Middleweres;
 using WebAPI.Respository;
 using WebAPI.Service;
 
@@ -22,13 +23,23 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Logging.AddJsonConsole(options =>
+{
+    options.IncludeScopes = true;
+});
+
+builder.Logging.Configure(options =>
+{
+    options.ActivityTrackingOptions = ActivityTrackingOptions.None;
+});
+
 #region [DB]
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(connectionString);
-},ServiceLifetime.Scoped);
+}, ServiceLifetime.Scoped);
 #endregion
 
 #region [Injeção de Dependencia]
@@ -37,6 +48,10 @@ builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<INivelAcessoRepository, NivelAcessoRepository>();
+
+
+builder.Services.AddTransient<CorrelationIdMiddleware>();
+
 #endregion
 
 #region [Config JWT]
@@ -81,7 +96,12 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddControllers();
 #endregion
 
+
 var app = builder.Build();
+
+app.UseMiddleware<CorrelationIdMiddleware>();
+app.UseMiddleware<LogMiddleware>();
+app.UseMiddleware<ExceptionMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

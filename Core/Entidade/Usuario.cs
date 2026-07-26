@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Core.Input;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,5 +19,12 @@ namespace Core.Entidade
         public ICollection<Jogo> Jogo{ get; set; }
         public NivelAcesso NivelAcesso { get; set; }
 
+        public void Atualizar(UsuarioUpdate usuarioUpdate, string password)
+        {
+            Nome = usuarioUpdate.Nome;
+            Email = usuarioUpdate.Email;
+            Senha = password;
+            NivelAcessoId = usuarioUpdate.NivelAcessoId;
+        }
     }
 }

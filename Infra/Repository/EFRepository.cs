@@ -26,20 +26,14 @@ namespace Infra.Repository
             _context.SaveChanges();
         }
 
-        public void Delete(int id)
-        {
-            _dbSet.Remove(GetById(id).Result);
-            _context.SaveChanges();
-        }
-
-        public async Task<IList<T>> GetAll()
+        public async Task<List<T>> GetAll()
         {
             return await _dbSet.ToListAsync();    
         }
 
         public async Task<T> GetById(int id)
         {
-            return await _dbSet.FirstOrDefaultAsync(x => x.Id == id);
+            return await _dbSet.FirstOrDefaultAsync(x => x.Id == id && x.Ativo);
         }
 
         public void Update(T entity)

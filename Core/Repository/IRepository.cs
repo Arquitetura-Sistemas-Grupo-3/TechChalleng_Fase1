@@ -9,7 +9,7 @@ namespace Core.Repository
 {
     public interface IRepository<T> where T: BaseEntity
     {
-        public Task<IList<T>> GetAll();
+        public Task<List<T>> GetAll();
 
         public Task<T> GetById(int id);
 
@@ -17,6 +17,5 @@ namespace Core.Repository
 
         public void Update(T entity);
 
-        public void Delete(int id);
     }
 }
