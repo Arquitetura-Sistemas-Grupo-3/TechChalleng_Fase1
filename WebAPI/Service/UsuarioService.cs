@@ -10,8 +10,6 @@ namespace WebAPI.Service
 {
     public class UsuarioService : IUsuarioService
     {
-        private TesteUsuarioRepository usuarioRepository;
-
         private IUsuarioRepository _usuarioRepository;
         public UsuarioService(IUsuarioRepository usuarioRepository) 
         {
