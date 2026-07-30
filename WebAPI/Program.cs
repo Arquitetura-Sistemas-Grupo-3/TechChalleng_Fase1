@@ -7,7 +7,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using WebAPI.Interface;
 using WebAPI.Middleweres;
-using WebAPI.Respository;
 using WebAPI.Service;
 
 var builder = WebApplication.CreateBuilder(args);

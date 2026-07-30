@@ -3,7 +3,6 @@ using Core.Entidade;
 using Core.Input;
 using Infra.Repository;
 using WebAPI.Interface;
-using WebAPI.Respository;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace WebAPI.Service
