@@ -19,32 +19,18 @@ namespace WebAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> Auth(string email, string password)
         {
-            try
-            {
-                AuthReturn? data = await _authService.Login(email, password);
+            AuthReturn? data = await _authService.Login(email, password);
 
-                if (data == null) return Unauthorized();
+            if (data == null) return Unauthorized();
 
-                return Ok(data);
-            }
-            catch (Exception ex) 
-            {
-                return BadRequest(ex.Message);
-            }
-            
+            return Ok(data);
         }
 
         [HttpGet("/admin")]
         [Authorize(Policy ="Admin")]
         public IActionResult Admin()
         {
-            try
-            {
-                return Ok("Endpoint ADMIN");
-            }catch(Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok("Endpoint ADMIN");
         }
     }
 }
