@@ -1,4 +1,7 @@
 using Core.Repository;
+using Core.Validation;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Infra.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +10,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using WebAPI.Interface;
 using WebAPI.Middleweres;
-using WebAPI.Respository;
 using WebAPI.Service;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -52,6 +54,13 @@ builder.Services.AddScoped<INivelAcessoRepository, NivelAcessoRepository>();
 
 builder.Services.AddTransient<CorrelationIdMiddleware>();
 
+#endregion
+
+#region [Validation]
+
+builder.Services.AddFluentValidationAutoValidation();
+
+builder.Services.AddValidatorsFromAssemblyContaining<UsuarioInputValidator>();
 #endregion
 
 #region [Config JWT]

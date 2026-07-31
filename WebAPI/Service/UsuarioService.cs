@@ -3,8 +3,8 @@ using Core.Entidade;
 using Core.Input;
 using Infra.Repository;
 using WebAPI.Interface;
-using WebAPI.Respository;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Infra.Exceptions;
 
 namespace WebAPI.Service
 {
@@ -53,7 +53,7 @@ namespace WebAPI.Service
             var usuario = await _usuarioRepository.GetById(id);
 
             if (usuario == null)
-                throw new Exception("Usuário não encontrado");
+                throw new ExcepetionUsuarioNaoEncontrado("Usuário não encontrado");
 
             return usuario;
         }

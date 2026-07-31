@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using Infra.Exceptions;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 public class ExceptionMiddleware
@@ -35,8 +36,17 @@ public class ExceptionMiddleware
     private static Task HandleExceptionAsync(HttpContext context, int statusCode, string message)
     {
         var result = JsonConvert.SerializeObject(new { error = message });
+
+        var details = new ProblemDetails
+        {
+            Title = message,
+            Status = context.Response.StatusCode = statusCode,
+            Detail = result,
+            Instance = context.Request.Path
+        };
+        
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = statusCode;
-        return context.Response.WriteAsync(result);
+        return context.Response.WriteAsJsonAsync(details);
     }
 }
