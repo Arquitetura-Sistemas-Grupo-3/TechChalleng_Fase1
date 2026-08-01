@@ -47,7 +47,7 @@ namespace WebAPI.Tests
         {
             // Arrange
             var mockUsuarioService = new Mock<IUsuarioService>();
-            mockUsuarioService.Setup(service => service.GetAll()).ReturnsAsync(new List<Usuario>
+            mockUsuarioService.Setup(service => service.GetAll(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int?>() )).ReturnsAsync(new List<Usuario>
                 {
                     new Usuario
                     {

@@ -16,13 +16,29 @@ namespace WebAPI.Service
             _usuarioRepository = usuarioRepository;
         }
 
-        public async Task<List<Usuario>> GetAll()
+        public async Task<List<Usuario>> GetAll(string? Nome = null, string? Email = null, int? NivelAcessoId = null)
         {
             
             var usuario = await _usuarioRepository.GetAll();
 
             if (usuario == null)
                 throw new Exception("Nenhum usuário encontrado");
+
+            if (!string.IsNullOrWhiteSpace(Nome))
+                usuario = usuario
+                    .Where(u => u.Nome.Contains(Nome, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+
+            if (!string.IsNullOrWhiteSpace(Email))
+                usuario = usuario
+                    .Where(u => u.Email.Contains(Email, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+
+            if (NivelAcessoId.HasValue)
+                usuario = usuario
+                    .Where(u => u.NivelAcessoId == NivelAcessoId.Value)
+                    .ToList();
+
 
             return usuario;
         }
