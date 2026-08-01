@@ -115,10 +115,10 @@ namespace WebAPI.Tests
         {
             // Arrange
             var mockUsuarioService = new Mock<IUsuarioService>();
-            mockUsuarioService.Setup(service => service.UpdateUsuario(It.IsAny<UsuarioUpdate>())).ReturnsAsync("Usuário atualizado com sucesso");
+            mockUsuarioService.Setup(service => service.UpdateUsuario(It.IsAny<UsuarioUpdate>(),1)).ReturnsAsync("Usuário atualizado com sucesso");
             var usuarioService = mockUsuarioService.Object;
             // Act
-            var usuario = await usuarioService.UpdateUsuario(new UsuarioUpdate { Id = 1, Nome = "Juli", Email = "ju.hernandesmh@gmail.com", NivelAcessoId = 1, Senha = "123" });
+            var usuario = await usuarioService.UpdateUsuario(new UsuarioUpdate {Nome = "Juli", Email = "ju.hernandesmh@gmail.com", NivelAcessoId = 1, Senha = "123" },1);
 
             Assert.Equal("Usuário atualizado com sucesso", usuario);
         }

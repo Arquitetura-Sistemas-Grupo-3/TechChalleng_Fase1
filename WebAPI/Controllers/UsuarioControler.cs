@@ -41,9 +41,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update([FromBody] UsuarioUpdate usuarioUpdate)
+        public async Task<IActionResult> Update([FromBody] UsuarioUpdate usuarioUpdate,int id)
         {
-            var usuario = await _usuarioService.UpdateUsuario(usuarioUpdate);
+            var usuario = await _usuarioService.UpdateUsuario(usuarioUpdate, id);
             return Ok(usuario);
         }
 

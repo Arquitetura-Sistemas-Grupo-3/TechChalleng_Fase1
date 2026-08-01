@@ -10,7 +10,7 @@ namespace WebAPI.Interface
 
         public Task<Usuario?> GetById(int id);
 
-        public Task<string> UpdateUsuario(UsuarioUpdate usuarioUpdate);
+        public Task<string> UpdateUsuario(UsuarioUpdate usuarioUpdate,int id);
         
         public Task<string> DeleteUsuario(int id);
     }

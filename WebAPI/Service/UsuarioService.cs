@@ -58,15 +58,18 @@ namespace WebAPI.Service
             return usuario;
         }
 
-        public async Task<string> UpdateUsuario(UsuarioUpdate usuarioUpdate)
+        public async Task<string> UpdateUsuario(UsuarioUpdate usuarioUpdate, int id)
         {
-            Usuario usuario = await _usuarioRepository.GetById(usuarioUpdate.Id);
+            Usuario usuario = await _usuarioRepository.GetById(id);
 
             if (usuario == null) throw new Exception("Usuário não encontrado");
-            
-            var password = BC.HashPassword(usuarioUpdate.Senha);
 
-            usuario.Atualizar(usuarioUpdate, password);
+            string? password;
+
+            if (!string.IsNullOrEmpty(usuarioUpdate.Senha)) password = BC.HashPassword(usuarioUpdate.Senha);
+            else password = null;
+
+            usuario.Atualizar(usuario,usuarioUpdate, password);
 
             _usuarioRepository.Update(usuario);
 
