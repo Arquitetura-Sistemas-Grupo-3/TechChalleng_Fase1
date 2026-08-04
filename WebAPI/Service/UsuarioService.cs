@@ -5,6 +5,7 @@ using Infra.Repository;
 using WebAPI.Interface;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Infra.Exceptions;
+using Core.Output;
 
 namespace WebAPI.Service
 {
@@ -16,10 +17,10 @@ namespace WebAPI.Service
             _usuarioRepository = usuarioRepository;
         }
 
-        public async Task<List<Usuario>> GetAll()
+        public async Task<List<UsuarioReturn>> GetAll()
         {
             
-            var usuario = await _usuarioRepository.GetAll();
+            var usuario = await _usuarioRepository.GetAllUsuario();
 
             if (usuario == null)
                 throw new Exception("Nenhum usuário encontrado");
@@ -48,9 +49,9 @@ namespace WebAPI.Service
                 return "Erro ao adicionar usuário";
             }
         }
-        public async Task<Usuario?> GetById(int id)
+        public async Task<UsuarioReturn?> GetById(int id)
         {
-            var usuario = await _usuarioRepository.GetById(id);
+            var usuario = await _usuarioRepository.GetUsuarioById(id);
 
             if (usuario == null)
                 throw new ExcepetionUsuarioNaoEncontrado("Usuário não encontrado");
