@@ -7,6 +7,7 @@ using Moq;
 using WebAPI.Interface;
 using Core.Input;
 using Core.Entidade;
+using Core.Output;
 
 namespace WebAPI.Tests
 {
@@ -47,17 +48,14 @@ namespace WebAPI.Tests
         {
             // Arrange
             var mockUsuarioService = new Mock<IUsuarioService>();
-            mockUsuarioService.Setup(service => service.GetAll()).ReturnsAsync(new List<Usuario>
+            mockUsuarioService.Setup(service => service.GetAll()).ReturnsAsync(new List<UsuarioReturn>
                 {
-                    new Usuario
+                    new UsuarioReturn
                     {
                         Id = 1,
                         Nome = "Juli",
                         Email = "juli@gmail.com",
-                        Senha = "123",
-                        NivelAcessoId = 1,
-                        Data = DateTime.Now,
-                        Jogo = new List<Jogo>()
+                        NivelAcesso = "Admin"
                     }
                 });
 
@@ -78,7 +76,7 @@ namespace WebAPI.Tests
         {
             // Arrange
             var mockUsuarioService = new Mock<IUsuarioService>();
-            mockUsuarioService.Setup(service => service.GetById(1)).ReturnsAsync(new Usuario
+            mockUsuarioService.Setup(service => service.GetById(1)).ReturnsAsync(new Core.Output.UsuarioReturn
             {
                 Id = 1,
                 Nome = "Juli"
