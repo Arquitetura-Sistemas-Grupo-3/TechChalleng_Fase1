@@ -1,16 +1,17 @@
 ﻿using Core.Entidade;
 using Core.Input;
+using Core.Output;
 
 namespace WebAPI.Interface
 {
     public interface IUsuarioService
     {
-        public Task<List<Usuario>> GetAll();
+        public Task<List<UsuarioReturn>> GetAll();
         public string AddUsuario(UsuarioInput usuarioInput);
 
-        public Task<Usuario?> GetById(int id);
+        public Task<UsuarioReturn?> GetById(int id);
 
-        public Task<string> UpdateUsuario(UsuarioUpdate usuarioUpdate);
+        public Task<string> UpdateUsuario(UsuarioUpdate usuarioUpdate,int id);
         
         public Task<string> DeleteUsuario(int id);
     }
