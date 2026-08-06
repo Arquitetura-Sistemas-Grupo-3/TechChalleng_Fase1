@@ -8,14 +8,12 @@ namespace Core.Input
 {
     public class UsuarioUpdate
     {
-        public required int Id { get; set; }
+        public string? Nome { get; set; }
 
-        public required string Nome { get; set; }
+        public string? Email { get; set; }
 
-        public required string Email { get; set; }
+        public string? Senha { get; set; }
 
-        public required string Senha { get; set; }
-
-        public required int NivelAcessoId { get; set; } 
+        public int NivelAcessoId { get; set; } 
     }
 }
