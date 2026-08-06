@@ -26,10 +26,10 @@ namespace WebAPI.Controllers
         /// </summary>
         /// <returns>Lista de usuários.</returns>
         [HttpGet]
-        [ProducesResponseType(typeof(List<Usuario>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetAllAsync()
+        public async Task<IActionResult> GetAllAsync([FromQuery] string? nome,[FromQuery] string? email,[FromQuery] int? nivelAcessoId) 
         {
-            var usuarios = await _usuarioService.GetAll();
+
+            var usuarios = await _usuarioService.GetAll(nome, email, nivelAcessoId);
             return Ok(usuarios);
         }
 
@@ -75,7 +75,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update([FromBody] UsuarioUpdate usuarioUpdate)
         {
-            var usuario = await _usuarioService.UpdateUsuario(usuarioUpdate);
+            var usuario = await _usuarioService.UpdateUsuario(usuarioUpdate, id);
             return Ok(usuario);
         }
 

@@ -1,4 +1,5 @@
 ﻿using Core.Entidade;
+using Core.Output;
 using Core.Repository;
 using System;
 using System.Collections.Generic;
@@ -11,5 +12,7 @@ namespace Infra.Repository
     public interface IUsuarioRepository : IRepository<Usuario>
     {
         public Task<Usuario?> ValidaEmailSenha(string email);
+        public Task<List<UsuarioReturn>> GetAllUsuario();
+        public Task<UsuarioReturn?> GetUsuarioById(int id);
     }
 }
