@@ -18,9 +18,10 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllAsync()
+        public async Task<IActionResult> GetAllAsync([FromQuery] string? nome,[FromQuery] string? email,[FromQuery] int? nivelAcessoId) 
         {
-            var usuarios = await _usuarioService.GetAll();
+
+            var usuarios = await _usuarioService.GetAll(nome, email, nivelAcessoId);
             return Ok(usuarios);
         }
 
@@ -41,9 +42,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update([FromBody] UsuarioUpdate usuarioUpdate)
+        public async Task<IActionResult> Update([FromBody] UsuarioUpdate usuarioUpdate,int id)
         {
-            var usuario = await _usuarioService.UpdateUsuario(usuarioUpdate);
+            var usuario = await _usuarioService.UpdateUsuario(usuarioUpdate, id);
             return Ok(usuario);
         }
 

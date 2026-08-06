@@ -7,6 +7,7 @@ using Moq;
 using WebAPI.Interface;
 using Core.Input;
 using Core.Entidade;
+using Core.Output;
 
 namespace WebAPI.Tests
 {
@@ -47,17 +48,14 @@ namespace WebAPI.Tests
         {
             // Arrange
             var mockUsuarioService = new Mock<IUsuarioService>();
-            mockUsuarioService.Setup(service => service.GetAll()).ReturnsAsync(new List<Usuario>
+            mockUsuarioService.Setup(service => service.GetAll(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int?>() )).ReturnsAsync(new List<UsuarioReturn>
                 {
-                    new Usuario
+                    new UsuarioReturn
                     {
                         Id = 1,
                         Nome = "Juli",
                         Email = "juli@gmail.com",
-                        Senha = "123",
-                        NivelAcessoId = 1,
-                        Data = DateTime.Now,
-                        Jogo = new List<Jogo>()
+                        NivelAcesso = "Admin"
                     }
                 });
 
@@ -78,7 +76,7 @@ namespace WebAPI.Tests
         {
             // Arrange
             var mockUsuarioService = new Mock<IUsuarioService>();
-            mockUsuarioService.Setup(service => service.GetById(1)).ReturnsAsync(new Usuario
+            mockUsuarioService.Setup(service => service.GetById(1)).ReturnsAsync(new Core.Output.UsuarioReturn
             {
                 Id = 1,
                 Nome = "Juli"
@@ -115,10 +113,10 @@ namespace WebAPI.Tests
         {
             // Arrange
             var mockUsuarioService = new Mock<IUsuarioService>();
-            mockUsuarioService.Setup(service => service.UpdateUsuario(It.IsAny<UsuarioUpdate>())).ReturnsAsync("Usuário atualizado com sucesso");
+            mockUsuarioService.Setup(service => service.UpdateUsuario(It.IsAny<UsuarioUpdate>(),1)).ReturnsAsync("Usuário atualizado com sucesso");
             var usuarioService = mockUsuarioService.Object;
             // Act
-            var usuario = await usuarioService.UpdateUsuario(new UsuarioUpdate { Id = 1, Nome = "Juli", Email = "ju.hernandesmh@gmail.com", NivelAcessoId = 1, Senha = "123" });
+            var usuario = await usuarioService.UpdateUsuario(new UsuarioUpdate {Nome = "Juli", Email = "ju.hernandesmh@gmail.com", NivelAcessoId = 1, Senha = "123" },1);
 
             Assert.Equal("Usuário atualizado com sucesso", usuario);
         }

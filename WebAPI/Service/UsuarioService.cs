@@ -5,6 +5,7 @@ using Infra.Repository;
 using WebAPI.Interface;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Infra.Exceptions;
+using Core.Output;
 
 namespace WebAPI.Service
 {
@@ -16,13 +17,29 @@ namespace WebAPI.Service
             _usuarioRepository = usuarioRepository;
         }
 
-        public async Task<List<Usuario>> GetAll()
+        public async Task<List<UsuarioReturn>> GetAll(string? Nome = null, string? Email = null, int? NivelAcessoId = null)
         {
             
-            var usuario = await _usuarioRepository.GetAll();
+            var usuario = await _usuarioRepository.GetAllUsuario();
 
             if (usuario == null)
                 throw new Exception("Nenhum usuário encontrado");
+
+            if (!string.IsNullOrWhiteSpace(Nome))
+                usuario = usuario
+                    .Where(u => u.Nome.Contains(Nome, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+
+            if (!string.IsNullOrWhiteSpace(Email))
+                usuario = usuario
+                    .Where(u => u.Email.Contains(Email, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+
+            if (NivelAcessoId.HasValue)
+                usuario = usuario
+                    .Where(u => u.NivelAcessoId == NivelAcessoId.Value)
+                    .ToList();
+
 
             return usuario;
         }
@@ -48,9 +65,9 @@ namespace WebAPI.Service
                 return "Erro ao adicionar usuário";
             }
         }
-        public async Task<Usuario?> GetById(int id)
+        public async Task<UsuarioReturn?> GetById(int id)
         {
-            var usuario = await _usuarioRepository.GetById(id);
+            var usuario = await _usuarioRepository.GetUsuarioById(id);
 
             if (usuario == null)
                 throw new ExcepetionUsuarioNaoEncontrado("Usuário não encontrado");
@@ -58,15 +75,18 @@ namespace WebAPI.Service
             return usuario;
         }
 
-        public async Task<string> UpdateUsuario(UsuarioUpdate usuarioUpdate)
+        public async Task<string> UpdateUsuario(UsuarioUpdate usuarioUpdate, int id)
         {
-            Usuario usuario = await _usuarioRepository.GetById(usuarioUpdate.Id);
+            Usuario usuario = await _usuarioRepository.GetById(id);
 
             if (usuario == null) throw new Exception("Usuário não encontrado");
-            
-            var password = BC.HashPassword(usuarioUpdate.Senha);
 
-            usuario.Atualizar(usuarioUpdate, password);
+            string? password;
+
+            if (!string.IsNullOrEmpty(usuarioUpdate.Senha)) password = BC.HashPassword(usuarioUpdate.Senha);
+            else password = null;
+
+            usuario.Atualizar(usuario,usuarioUpdate, password);
 
             _usuarioRepository.Update(usuario);
 
