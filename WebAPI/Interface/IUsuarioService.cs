@@ -6,7 +6,7 @@ namespace WebAPI.Interface
 {
     public interface IUsuarioService
     {
-        public Task<List<UsuarioReturn>> GetAll(string? nome = null, string? email = null, int? nivelAcessoId = null);
+        public Task<List<UsuarioReturn>> GetAll(string? nome = null, string? email = null, string? nivelAcessoId = null);
         
         public string AddUsuario(UsuarioInput usuarioInput);
 

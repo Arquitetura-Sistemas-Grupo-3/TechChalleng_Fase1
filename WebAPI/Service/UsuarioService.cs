@@ -17,7 +17,7 @@ namespace WebAPI.Service
             _usuarioRepository = usuarioRepository;
         }
 
-        public async Task<List<UsuarioReturn>> GetAll(string? Nome = null, string? Email = null, int? NivelAcessoId = null)
+        public async Task<List<UsuarioReturn>> GetAll(string? Nome = null, string? Email = null, string? NivelAcesso = null)
         {
             
             var usuario = await _usuarioRepository.GetAllUsuario();
@@ -35,9 +35,9 @@ namespace WebAPI.Service
                     .Where(u => u.Email.Contains(Email, StringComparison.OrdinalIgnoreCase))
                     .ToList();
 
-            if (NivelAcessoId.HasValue)
+            if (!string.IsNullOrWhiteSpace(NivelAcesso))
                 usuario = usuario
-                    .Where(u => u.NivelAcessoId == NivelAcessoId.Value)
+                    .Where(u => u.NivelAcesso.Contains(NivelAcesso, StringComparison.OrdinalIgnoreCase))
                     .ToList();
 
 

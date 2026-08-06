@@ -18,10 +18,10 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllAsync([FromQuery] string? nome,[FromQuery] string? email,[FromQuery] int? nivelAcessoId) 
+        public async Task<IActionResult> GetAllAsync([FromQuery] string? nome,[FromQuery] string? email,[FromQuery] string? nivelAcesso) 
         {
 
-            var usuarios = await _usuarioService.GetAll(nome, email, nivelAcessoId);
+            var usuarios = await _usuarioService.GetAll(nome, email, nivelAcesso);
             return Ok(usuarios);
         }
 
