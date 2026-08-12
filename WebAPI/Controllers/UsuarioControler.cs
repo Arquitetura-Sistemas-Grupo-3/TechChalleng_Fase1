@@ -73,7 +73,7 @@ namespace WebAPI.Controllers
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update([FromBody] UsuarioUpdate usuarioUpdate)
+        public async Task<IActionResult> Update([FromBody] UsuarioUpdate usuarioUpdate, [FromRoute] int id)
         {
             var usuario = await _usuarioService.UpdateUsuario(usuarioUpdate, id);
             return Ok(usuario);
