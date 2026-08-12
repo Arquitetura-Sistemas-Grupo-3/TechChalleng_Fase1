@@ -14,5 +14,6 @@ namespace Infra.Repository
         public Task<Usuario?> ValidaEmailSenha(string email);
         public Task<List<UsuarioReturn>> GetAllUsuario();
         public Task<UsuarioReturn?> GetUsuarioById(int id);
+        public Task<Usuario?> ValidaEmail(string email);
     }
 }

@@ -18,6 +18,11 @@ namespace Infra.Repository
 
         public async Task<Usuario?> ValidaEmailSenha(string email)
         {
+            return await _dbSet.FirstOrDefaultAsync(u => u.Email == email && u.Ativo);
+        }
+
+        public async Task<Usuario?> ValidaEmail(string email)
+        {
             return await _dbSet.FirstOrDefaultAsync(u => u.Email == email);
         }
 
@@ -25,6 +30,7 @@ namespace Infra.Repository
         {
             return await _dbSet
                 .Include(u => u.NivelAcesso)
+                .Where(u => u.Ativo)
                 .Select(u => new UsuarioReturn { Id= u.Id, Nome = u.Nome, Email =u.Email,DataCriacao = u.Data, NivelAcesso = u.NivelAcesso.Nome })
                 .ToListAsync();
               
@@ -33,6 +39,7 @@ namespace Infra.Repository
         public async Task<UsuarioReturn?> GetUsuarioById(int id)
         {
             return await _dbSet
+                .Where(u => u.Ativo)
                 .Select(u => new UsuarioReturn { Id = u.Id, Nome = u.Nome, Email = u.Email, DataCriacao = u.Data, NivelAcesso = u.NivelAcesso.Nome })
                 .FirstOrDefaultAsync(x => x.Id == id);
         }

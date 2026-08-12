@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BC = BCrypt.Net.BCrypt;
 
 namespace Core.Entidade
 {
@@ -18,6 +19,17 @@ namespace Core.Entidade
 
         public ICollection<Jogo> Jogo{ get; set; }
         public NivelAcesso NivelAcesso { get; set; }
+
+        public static Usuario AddUsuario(UsuarioInput usuario)
+        {
+            return new Usuario
+            {
+                Nome = usuario.Nome,
+                Email = usuario.Email,
+                Senha = BC.HashPassword(usuario.Senha),
+                NivelAcessoId = usuario.NivelAcessoId
+            };
+        }
 
         public void Atualizar(Usuario usuarioAntigo,UsuarioUpdate usuarioNovo, string? password)
         {
