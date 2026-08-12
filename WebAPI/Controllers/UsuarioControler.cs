@@ -57,9 +57,9 @@ namespace WebAPI.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        public IActionResult Add([FromBody] UsuarioInput usuarioInput)
+        public async Task<IActionResult> Add([FromBody] UsuarioInput usuarioInput)
         {
-            var usuario = _usuarioService.AddUsuario(usuarioInput);
+            var usuario = await _usuarioService.AddUsuario(usuarioInput);
 
             return Ok(usuario);
         }
@@ -73,7 +73,7 @@ namespace WebAPI.Controllers
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update([FromBody] UsuarioUpdate usuarioUpdate)
+        public async Task<IActionResult> Update([FromBody] UsuarioUpdate usuarioUpdate, int id)
         {
             var usuario = await _usuarioService.UpdateUsuario(usuarioUpdate, id);
             return Ok(usuario);
@@ -88,9 +88,9 @@ namespace WebAPI.Controllers
         [HttpDelete("{id}")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var usuario = _usuarioService.DeleteUsuario(id);
+            var usuario = await _usuarioService.DeleteUsuario(id);
             return Ok(usuario);
         }
     }
