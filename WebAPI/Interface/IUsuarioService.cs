@@ -15,5 +15,6 @@ namespace WebAPI.Interface
         public Task<string> UpdateUsuario(UsuarioUpdate usuarioUpdate,int id);
         
         public Task<string> DeleteUsuario(int id);
+        public Task<UsuarioReturn?> GetMe(string email);
     }
 }
