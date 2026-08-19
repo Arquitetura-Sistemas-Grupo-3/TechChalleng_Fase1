@@ -49,6 +49,7 @@ namespace WebAPI.Service
         public async Task<string> AddUsuario(UsuarioInput usuarioInput)
         {
           
+            var senha = usuarioInput.Senha;
             var usuario = await _usuarioRepository.ValidaEmail(usuarioInput.Email);
 
             if(usuario != null)
@@ -57,11 +58,17 @@ namespace WebAPI.Service
             if (usuarioInput.NivelAcessoId >= 3)
                 throw new ExceptionNivelAcessoInvalido("Nível de acesso inválido");
 
-            try
-            {                     
-                usuario = Usuario.AddUsuario(usuarioInput);
+            if (!string.IsNullOrEmpty(senha))
+               senha = BC.HashPassword(senha);
+           else
+                throw new ExceptionSenhaInvalida("Senha inválida");
 
-                _usuarioRepository.Add(usuario);
+            try
+            {
+                var user = new Usuario();
+                user = user.AddUsuario(usuarioInput, senha);
+
+                _usuarioRepository.Add(user);
 
                 return "Usuário adicionado com sucesso";
             }
