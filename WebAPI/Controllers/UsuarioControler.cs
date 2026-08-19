@@ -1,7 +1,9 @@
 ﻿using Core.Entidade;
 using Core.Input;
 using Infra.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using WebAPI.Interface;
 using WebAPI.Service;
 
@@ -26,6 +28,7 @@ namespace WebAPI.Controllers
         /// </summary>
         /// <returns>Lista de usuários.</returns>
         [HttpGet]
+        [Authorize(Policy = "Admin")]
         public async Task<IActionResult> GetAllAsync([FromQuery] string? nome,[FromQuery] string? email,[FromQuery] string? nivelAcesso) 
         {
 
@@ -42,6 +45,7 @@ namespace WebAPI.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(Usuario), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [Authorize(Policy = "Admin")]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
             var usuario = await _usuarioService.GetById(id);
@@ -73,6 +77,7 @@ namespace WebAPI.Controllers
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [Authorize]
         public async Task<IActionResult> Update([FromBody] UsuarioUpdate usuarioUpdate, [FromRoute] int id)
         {
             var usuario = await _usuarioService.UpdateUsuario(usuarioUpdate, id);
@@ -88,10 +93,27 @@ namespace WebAPI.Controllers
         [HttpDelete("{id}")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [Authorize(Policy = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var usuario = await _usuarioService.DeleteUsuario(id);
             return Ok(usuario);
+        }
+
+        /// <summary>
+        /// Consulta o usuário autenticado.
+        /// </summary>
+        /// <returns>Dados do usuário encontrado.</returns>
+        /// <response code="404">Usuário não encontrado.</response>
+        [HttpGet("me")]
+        [ProducesResponseType(typeof(Usuario), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [Authorize]
+        public async Task<IActionResult> GetMe()
+        {
+            var username = await _usuarioService.GetMe(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            return Ok(new { username });
         }
     }
 }

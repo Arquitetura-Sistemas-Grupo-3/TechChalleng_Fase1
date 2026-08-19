@@ -111,5 +111,15 @@ namespace WebAPI.Service
 
             return "Deletado com sucesso";
         }
+
+        public async Task<UsuarioReturn?> GetMe(string email)
+        {
+            var usuario = await _usuarioRepository.GetUsuarioByEmail(email);
+
+            if (usuario == null)
+                throw new ExcepetionUsuarioNaoEncontrado("Usuário não encontrado");
+
+            return usuario;
+        }
     }
 }

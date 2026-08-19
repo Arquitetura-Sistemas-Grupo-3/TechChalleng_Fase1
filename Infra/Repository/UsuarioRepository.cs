@@ -43,5 +43,13 @@ namespace Infra.Repository
                 .Select(u => new UsuarioReturn { Id = u.Id, Nome = u.Nome, Email = u.Email, DataCriacao = u.Data, NivelAcesso = u.NivelAcesso.Nome })
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
+
+        public async Task<UsuarioReturn?> GetUsuarioByEmail(string email)
+        {
+            return await _dbSet
+                .Where(u => u.Email == email)
+                .Select(u => new UsuarioReturn { Id = u.Id, Nome = u.Nome, Email = u.Email, DataCriacao = u.Data, NivelAcesso = u.NivelAcesso.Nome })
+                .FirstOrDefaultAsync();
+        }
     }
 }
