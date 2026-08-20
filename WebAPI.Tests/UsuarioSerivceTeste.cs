@@ -28,6 +28,43 @@ namespace WebAPI.Tests
             Assert.Equal("Usuário adicionado com sucesso", resultado.Result);
         }
 
+
+        [Fact(DisplayName = "Validação de adicionar usuário")]
+        [Trait("Categoria", "Validação Usuário")]
+        public void Add_ShouldReturnSuccess()
+        {
+            var moackUsuario = new Mock<Usuario>();
+
+            moackUsuario.Setup(u=> u.AddUsuario(It.IsAny<UsuarioInput>(), It.IsAny<string>())).Returns(new Usuario { Nome = "Juli", Email = "",  Senha = "123", NivelAcessoId = 1 });
+
+            var usuario = moackUsuario.Object;
+            var resultado = usuario.AddUsuario(new UsuarioInput { Nome = "", Email = "", Senha = "", NivelAcessoId = 1 }, "");
+
+            Assert.Equal("Juli", resultado.Nome);
+            Assert.Equal("123", resultado.Senha);
+            Assert.Equal(1, resultado.NivelAcessoId);
+        }
+
+        [Fact(DisplayName = "Validação de atualização do usuário")]
+        [Trait("Categoria", "Validação Usuário")]
+        public void Update_ShouldReturnSucess()
+        {
+            var moackUsuario = new Mock<Usuario>();
+
+            moackUsuario.Setup(u => u.Atualizar(It.IsAny<Usuario>(), It.IsAny<UsuarioUpdate>(), It.IsAny<string>())).Callback<Usuario,UsuarioUpdate, string>((usuario, usuarioAntigo, nome) => 
+            { 
+                usuario.Nome = "Ju";
+                usuario.Email = "ju.hernandesmh@gmail.com";
+                usuario.Senha = "123";
+                usuario.NivelAcessoId =1;
+            });
+
+            var usuario = moackUsuario.Object;
+            usuario.Atualizar(new Usuario { Nome = "Juli", Email = "ju.hernandesmh@gmail.com", Senha = "123", NivelAcessoId = 1 }, new UsuarioUpdate { Nome = "Juli", Email = "", Senha = "", NivelAcessoId = 1 }, "");
+            
+            moackUsuario.Verify(u => u.Atualizar(It.IsAny<Usuario>(), It.IsAny<UsuarioUpdate>(), It.IsAny<string>()), Times.Once);
+        }
+
         [Fact(DisplayName = "Validação de criação de usuário com erro")]
         [Trait("Categoria", "Validação Usuário")]
         public void Create_ShouldReturnErrorMessage()
