@@ -63,7 +63,23 @@ namespace WebAPI.Controllers
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Add([FromBody] UsuarioInput usuarioInput)
         {
-            var usuario = await _usuarioService.AddUsuario(usuarioInput);
+            var usuario = await _usuarioService.AddUsuario(usuarioInput,2);
+
+            return Ok(usuario);
+        }
+
+        /// <summary>
+        /// Cadastra um novo usuário Administrador.
+        /// </summary>
+        /// <param name="usuarioInput">Dados do usuário a ser criado.</param>
+        /// <returns>Mensagem de confirmação do cadastro.</returns>
+        [HttpPost("admin")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [Authorize(Policy = "Admin")]
+        public async Task<IActionResult> AddAdmin([FromBody] UsuarioInput usuarioInput)
+        {
+            var usuario = await _usuarioService.AddUsuario(usuarioInput, 1);
 
             return Ok(usuario);
         }

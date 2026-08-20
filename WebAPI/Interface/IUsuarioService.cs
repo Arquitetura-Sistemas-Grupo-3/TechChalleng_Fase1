@@ -8,7 +8,7 @@ namespace WebAPI.Interface
     {
         public Task<List<UsuarioReturn>> GetAll(string? nome = null, string? email = null, string? nivelAcessoId = null);
         
-        public Task<string> AddUsuario(UsuarioInput usuarioInput);
+        public Task<string> AddUsuario(UsuarioInput usuarioInput,int nivelAcessoId);
 
         public Task<UsuarioReturn?> GetById(int id);
 

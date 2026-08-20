@@ -3,11 +3,8 @@ using Core.Entidade;
 using Core.Input;
 using Infra.Repository;
 using WebAPI.Interface;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Infra.Exceptions;
 using Core.Output;
-using Microsoft.AspNetCore.Identity;
-using Core.Entidade;
 
 namespace WebAPI.Service
 {
@@ -46,7 +43,7 @@ namespace WebAPI.Service
             return usuario;
         }
 
-        public async Task<string> AddUsuario(UsuarioInput usuarioInput)
+        public async Task<string> AddUsuario(UsuarioInput usuarioInput,int idNivelAcesso)
         {
           
             var usuario = await _usuarioRepository.ValidaEmail(usuarioInput.Email);
@@ -54,12 +51,9 @@ namespace WebAPI.Service
             if(usuario != null)
                 throw new ExceptionEmailCadastrado("E-mail já cadastrado");
 
-            if (usuarioInput.NivelAcessoId >= 3)
-                throw new ExceptionNivelAcessoInvalido("Nível de acesso inválido");
-
             try
             {                     
-                usuario = Usuario.AddUsuario(usuarioInput);
+                usuario = Usuario.AddUsuario(usuarioInput, idNivelAcesso);
 
                 _usuarioRepository.Add(usuario);
 
