@@ -35,10 +35,10 @@ namespace WebAPI.Tests
         {
             var moackUsuario = new Mock<Usuario>();
 
-            moackUsuario.Setup(u=> u.AddUsuario(It.IsAny<UsuarioInput>(), It.IsAny<string>())).Returns(new Usuario { Nome = "Juli", Email = "",  Senha = "123", NivelAcessoId = 1 });
+            moackUsuario.Setup( u=> u.AddUsuario(It.IsAny<UsuarioInput>(),It.IsAny<int>(), It.IsAny<string>())).Returns(new Usuario { Nome = "Juli", Email = "",  Senha = "123", NivelAcessoId = 1 });
 
             var usuario = moackUsuario.Object;
-            var resultado = usuario.AddUsuario(new UsuarioInput { Nome = "", Email = "", Senha = "", NivelAcessoId = 1 }, "");
+            var resultado = usuario.AddUsuario(new UsuarioInput { Nome = "", Email = "", Senha = "" }, 1, "");
 
             Assert.Equal("Juli", resultado.Nome);
             Assert.Equal("123", resultado.Senha);

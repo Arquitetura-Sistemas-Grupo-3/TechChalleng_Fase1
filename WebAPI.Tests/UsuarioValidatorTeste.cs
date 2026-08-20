@@ -22,7 +22,7 @@ namespace WebAPI.Tests
         [Trait("Validação", "Usuário")]
         public void Validator_ShouldReturnEmailErrorMessage()
         {
-            var resultado = validation.Validate(new UsuarioInput { Email = "", NivelAcessoId = 1, Nome = "", Senha = "" });
+            var resultado = validation.Validate(new UsuarioInput { Email = "", Nome = "", Senha = "" });
 
             resultado.Errors.Should().Contain(e => e.ErrorMessage == "O e-mail é obrigatório.");
           
@@ -32,7 +32,7 @@ namespace WebAPI.Tests
         [Trait("Validação", "Usuário")]
         public void Validator_ShouldReturnEmailInvalidErrorMessage()
         {
-            var resultado = validation.Validate(new UsuarioInput { Email = "juli.com", NivelAcessoId = 1, Nome = "", Senha = "" });
+            var resultado = validation.Validate(new UsuarioInput { Email = "juli.com", Nome = "", Senha = "" });
 
             resultado.Errors.Should().Contain(e => e.ErrorMessage == "Formato de e-mail inválido.");
         }
@@ -41,7 +41,7 @@ namespace WebAPI.Tests
         [Trait("Validação", "Usuário")]
         public void Validator_ShouldReturnPasswodErrorMessage()
         { 
-            var resultado = validation.Validate(new UsuarioInput { Email = "", NivelAcessoId = 1, Nome = "", Senha = "" });
+            var resultado = validation.Validate(new UsuarioInput { Email = "", Nome = "", Senha = "" });
 
             resultado.Errors.Should().Contain(e => e.ErrorMessage == "A senha é obrigatória.");
             resultado.Errors.Should().Contain(e => e.ErrorMessage == "A senha deve ter no mínimo 8 caracteres.");
@@ -51,19 +51,11 @@ namespace WebAPI.Tests
             resultado.Errors.Should().Contain(e => e.ErrorMessage == "A senha deve conter ao menos um número.");
         }
 
-        [Fact(DisplayName = "Validação nível de acesso inválido")]
-        [Trait("Validação", "Usuário")]
-        public void Validator_ShouldReturnNivelAcessoErrorMessage()
-        { 
-            var resultado = validation.Validate(new UsuarioInput { Email = "", NivelAcessoId = 0, Nome = "", Senha = "" });
-            resultado.Errors.Should().Contain(e => e.ErrorMessage == "O nível de acesso é obrigatório.");   
-        }
-
         [Fact(DisplayName = "Validação nome vazio")]
         [Trait("Validação", "Usuário")]
         public void Validator_ShouldReturnNomeErrorMessage()
         {
-            var resultado = validation.Validate(new UsuarioInput { Email = "", NivelAcessoId = 1, Nome = "", Senha = "" });
+            var resultado = validation.Validate(new UsuarioInput { Email = "", Nome = "", Senha = "" });
             resultado.Errors.Should().Contain(e => e.ErrorMessage == "O nome é obrigatório.");
         }
 
