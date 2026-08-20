@@ -38,21 +38,5 @@ namespace WebAPI.Controllers
 
             return Ok(data);
         }
-
-        /// <summary>
-        /// Endpoint de exemplo restrito a usuários com a política "Admin".
-        /// </summary>
-        /// <returns>Mensagem de confirmação de acesso.</returns>
-        /// <response code="401">Usuário não autenticado.</response>
-        /// <response code="403">Usuário autenticado sem permissão de Admin.</response>
-        [HttpGet("/admin")]
-        [Authorize(Policy ="Admin")]
-        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public IActionResult Admin()
-        {
-            return Ok("Endpoint ADMIN");
-        }
     }
 }

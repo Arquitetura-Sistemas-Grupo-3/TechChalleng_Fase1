@@ -3,11 +3,8 @@ using Core.Entidade;
 using Core.Input;
 using Infra.Repository;
 using WebAPI.Interface;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Infra.Exceptions;
 using Core.Output;
-using Microsoft.AspNetCore.Identity;
-using Core.Entidade;
 
 namespace WebAPI.Service
 {
@@ -46,7 +43,7 @@ namespace WebAPI.Service
             return usuario;
         }
 
-        public async Task<string> AddUsuario(UsuarioInput usuarioInput)
+        public async Task<string> AddUsuario(UsuarioInput usuarioInput,int idNivelAcesso)
         {
           
             var senha = usuarioInput.Senha;
@@ -55,18 +52,16 @@ namespace WebAPI.Service
             if(usuario != null)
                 throw new ExceptionEmailCadastrado("E-mail já cadastrado");
 
-            if (usuarioInput.NivelAcessoId >= 3)
-                throw new ExceptionNivelAcessoInvalido("Nível de acesso inválido");
 
             if (!string.IsNullOrEmpty(senha))
                senha = BC.HashPassword(senha);
-           else
+            else
                 throw new ExceptionSenhaInvalida("Senha inválida");
 
             try
             {
                 var user = new Usuario();
-                user = user.AddUsuario(usuarioInput, senha);
+                user = user.AddUsuario(usuarioInput,idNivelAcesso ,senha);
 
                 _usuarioRepository.Add(user);
 
@@ -117,6 +112,16 @@ namespace WebAPI.Service
             _usuarioRepository.Update(usuario);
 
             return "Deletado com sucesso";
+        }
+
+        public async Task<UsuarioReturn?> GetMe(string email)
+        {
+            var usuario = await _usuarioRepository.GetUsuarioByEmail(email);
+
+            if (usuario == null)
+                throw new ExcepetionUsuarioNaoEncontrado("Usuário não encontrado");
+
+            return usuario;
         }
     }
 }

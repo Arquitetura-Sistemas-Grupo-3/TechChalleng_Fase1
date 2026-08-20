@@ -19,14 +19,14 @@ namespace Core.Entidade
         public ICollection<Jogo> Jogo{ get; set; }
         public NivelAcesso NivelAcesso { get; set; }
 
-        public virtual Usuario AddUsuario(UsuarioInput usuario, string? password)
+        public virtual static Usuario AddUsuario(UsuarioInput usuario, int nivelAcessoId,string? password)
         {
             return new Usuario
             {
                 Nome = usuario.Nome,
                 Email = usuario.Email,
                 Senha = password,
-                NivelAcessoId = usuario.NivelAcessoId
+                NivelAcessoId = nivelAcessoId
             };
         }
 

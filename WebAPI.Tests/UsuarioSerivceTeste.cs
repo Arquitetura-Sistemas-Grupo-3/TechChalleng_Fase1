@@ -19,10 +19,11 @@ namespace WebAPI.Tests
         {
          
             var mockUsuarioService = new Mock<IUsuarioService>();
-            mockUsuarioService.Setup(service => service.AddUsuario(It.IsAny<UsuarioInput>())).ReturnsAsync("Usuário adicionado com sucesso");
+            mockUsuarioService.Setup(service => service.AddUsuario(It.IsAny<UsuarioInput>(), It.IsAny<int>())).ReturnsAsync("Usuário adicionado com sucesso");
             var usuarioService = mockUsuarioService.Object;
-        
-            var resultado = usuarioService.AddUsuario(new UsuarioInput { Email = "ju@gmail.com", Nome = "ju.hernandesmh@gmail", NivelAcessoId = 1, Senha = "123" });
+
+            int nivelAcessoId = 1;
+            var resultado = usuarioService.AddUsuario(new UsuarioInput { Email = "ju@gmail.com", Nome = "ju.hernandesmh@gmail", Senha = "123" }, nivelAcessoId);
           
             Assert.Equal("Usuário adicionado com sucesso", resultado.Result);
         }
@@ -70,10 +71,10 @@ namespace WebAPI.Tests
         {
            
             var mockUsuarioService = new Mock<IUsuarioService>();
-            mockUsuarioService.Setup(service => service.AddUsuario(It.IsAny<UsuarioInput>())).ReturnsAsync("Erro ao adicionar usuário");
+            mockUsuarioService.Setup(service => service.AddUsuario(It.IsAny<UsuarioInput>(),It.IsAny<int>())).ReturnsAsync("Erro ao adicionar usuário");
             var usuarioService = mockUsuarioService.Object;
            
-            var resultado = usuarioService.AddUsuario(new UsuarioInput { Email = "ju", Nome = "ju", NivelAcessoId = 3, Senha = "" });
+            var resultado = usuarioService.AddUsuario(new UsuarioInput { Email = "ju", Nome = "ju", Senha = "" },3);
 
             Assert.Equal("Erro ao adicionar usuário", resultado.Result);
 
