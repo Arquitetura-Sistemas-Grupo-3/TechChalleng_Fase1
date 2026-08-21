@@ -27,7 +27,7 @@ namespace WebAPI.Service
             _logger = logger;
         }
 
-        public async Task<ServiceResponse<AuthReturn>> Login(string email, string senha)
+        public async Task<ServiceResponse<AutenticarResposta>> Autenticar(string email, string senha)
         {
             _logger.LogInformation("Tentativa de login para {Email}", email);
 
@@ -36,14 +36,14 @@ namespace WebAPI.Service
             if (usuario == null || !BC.Verify(senha, usuario.Senha))
             {
                 _logger.LogWarning("Falha de autenticação para {Email}", email);
-                return ServiceResponse<AuthReturn>.Fail("E-mail ou senha inválidos");
+                return ServiceResponse<AutenticarResposta>.Fail("E-mail ou senha inválidos");
             }
 
             NivelAcesso acesso = await _nivelAcessoRepository.GetById(usuario.NivelAcessoId);
 
             string jwt = GerarJWT(usuario.Email, acesso.Nome);
 
-            AuthReturn auth = new AuthReturn
+            AutenticarResposta auth = new AutenticarResposta
             {
                 NomeUsuario = usuario.Nome,
                 Token = jwt
@@ -51,7 +51,7 @@ namespace WebAPI.Service
 
             _logger.LogInformation("Login realizado com sucesso para {Email}", email);
 
-            return ServiceResponse<AuthReturn>.Ok(auth);
+            return ServiceResponse<AutenticarResposta>.Ok(auth);
         }
 
         private string GerarJWT(string username, string role)

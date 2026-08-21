@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Core.Input
 {
-    public class UsuarioUpdate
+    public class UsuarioAtualizarRequisicao
     {
         public string? Nome { get; set; }
 

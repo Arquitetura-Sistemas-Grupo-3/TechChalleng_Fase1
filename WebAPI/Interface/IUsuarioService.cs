@@ -6,15 +6,15 @@ namespace WebAPI.Interface
 {
     public interface IUsuarioService
     {
-        public Task<ServiceResponse<List<UsuarioGetAllReturn>>> GetAll(string? nome = null, string? email = null, string? nivelAcessoId = null);
+        public Task<ServiceResponse<List<UsuarioListarResposta>>> Listar(string? nome = null, string? email = null, string? nivelAcessoId = null);
 
-        public Task<ServiceResponse<UsuarioAddReturn>> AddUsuario(UsuarioInput usuarioInput,int nivelAcessoId);
+        public Task<ServiceResponse<UsuarioAdicionarResposta>> AdicionarUsuario(UsuarioAdicionarRequisicao usuarioInput,int nivelAcessoId);
 
-        public Task<ServiceResponse<UsuarioGetByIdReturn>> GetById(int id);
+        public Task<ServiceResponse<UsuarioBuscarPorIdResposta>> BuscarPorId(int id);
 
-        public Task<ServiceResponse> UpdateUsuario(UsuarioUpdate usuarioUpdate,int id);
+        public Task<ServiceResponse> AtualizarUsuario(UsuarioAtualizarRequisicao usuarioUpdate,int id);
 
-        public Task<ServiceResponse> DeleteUsuario(int id);
-        public Task<ServiceResponse<UsuarioMeReturn>> GetMe(string email);
+        public Task<ServiceResponse> RemoverUsuario(int id);
+        public Task<ServiceResponse<UsuarioBuscarAutenticadoResposta>> BuscarAutenticado(string email);
     }
 }

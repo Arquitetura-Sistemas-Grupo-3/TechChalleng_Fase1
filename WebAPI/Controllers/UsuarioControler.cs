@@ -30,10 +30,10 @@ namespace WebAPI.Controllers
         /// <returns>Lista de usuários.</returns>
         [HttpGet]
         [Authorize(Policy = "Admin")]
-        public async Task<IActionResult> GetAllAsync([FromQuery] string? nome,[FromQuery] string? email,[FromQuery] string? nivelAcesso) 
+        public async Task<IActionResult> ListarAsync([FromQuery] string? nome,[FromQuery] string? email,[FromQuery] string? nivelAcesso)
         {
 
-            var usuarios = await _usuarioService.GetAll(nome, email, nivelAcesso);
+            var usuarios = await _usuarioService.Listar(nome, email, nivelAcesso);
             return Ok(usuarios);
         }
 
@@ -44,12 +44,12 @@ namespace WebAPI.Controllers
         /// <returns>Dados do usuário encontrado.</returns>
         /// <response code="404">Usuário não encontrado.</response>
         [HttpGet("{id}")]
-        [ProducesResponseType(typeof(ServiceResponse<UsuarioGetByIdReturn>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ServiceResponse<UsuarioBuscarPorIdResposta>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [Authorize(Policy = "Admin")]
-        public async Task<IActionResult> GetByIdAsync(int id)
+        public async Task<IActionResult> BuscarPorIdAsync(int id)
         {
-            var usuario = await _usuarioService.GetById(id);
+            var usuario = await _usuarioService.BuscarPorId(id);
 
             return Ok(usuario);
         }
@@ -60,12 +60,12 @@ namespace WebAPI.Controllers
         /// <param name="usuarioInput">Dados do usuário a ser criado.</param>
         /// <returns>Mensagem de confirmação do cadastro.</returns>
         [HttpPost]
-        [ProducesResponseType(typeof(ServiceResponse<UsuarioAddReturn>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ServiceResponse<UsuarioAdicionarResposta>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Add([FromBody] UsuarioInput usuarioInput)
+        public async Task<IActionResult> Adicionar([FromBody] UsuarioAdicionarRequisicao usuarioInput)
         {
-            var usuario = await _usuarioService.AddUsuario(usuarioInput,2);
-            return CreatedAtAction("GetById", new { id = usuario.Data.Id }, usuario);
+            var usuario = await _usuarioService.AdicionarUsuario(usuarioInput,2);
+            return CreatedAtAction("BuscarPorId", new { id = usuario.Data.Id }, usuario);
         }
 
         /// <summary>
@@ -74,14 +74,14 @@ namespace WebAPI.Controllers
         /// <param name="usuarioInput">Dados do usuário a ser criado.</param>
         /// <returns>Mensagem de confirmação do cadastro.</returns>
         [HttpPost("admin")]
-        [ProducesResponseType(typeof(ServiceResponse<UsuarioAddReturn>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ServiceResponse<UsuarioAdicionarResposta>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [Authorize(Policy = "Admin")]
-        public async Task<IActionResult> AddAdmin([FromBody] UsuarioInput usuarioInput)
+        public async Task<IActionResult> AdicionarAdmin([FromBody] UsuarioAdicionarRequisicao usuarioInput)
         {
-            var usuario = await _usuarioService.AddUsuario(usuarioInput, 1);
+            var usuario = await _usuarioService.AdicionarUsuario(usuarioInput, 1);
 
-            return CreatedAtAction("GetById", new { id = usuario.Data.Id }, usuario);
+            return CreatedAtAction("BuscarPorId", new { id = usuario.Data.Id }, usuario);
         }
 
         /// <summary>
@@ -94,9 +94,9 @@ namespace WebAPI.Controllers
         [ProducesResponseType(typeof(ServiceResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [Authorize]
-        public async Task<IActionResult> Update([FromBody] UsuarioUpdate usuarioUpdate, [FromRoute] int id)
+        public async Task<IActionResult> Atualizar([FromBody] UsuarioAtualizarRequisicao usuarioUpdate, [FromRoute] int id)
         {
-            var usuario = await _usuarioService.UpdateUsuario(usuarioUpdate, id);
+            var usuario = await _usuarioService.AtualizarUsuario(usuarioUpdate, id);
             return Ok(usuario);
         }
 
@@ -110,9 +110,9 @@ namespace WebAPI.Controllers
         [ProducesResponseType(typeof(ServiceResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [Authorize(Policy = "Admin")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Remover(int id)
         {
-            var usuario = await _usuarioService.DeleteUsuario(id);
+            var usuario = await _usuarioService.RemoverUsuario(id);
             return Ok(usuario);
         }
 
@@ -122,14 +122,14 @@ namespace WebAPI.Controllers
         /// <returns>Dados do usuário encontrado.</returns>
         /// <response code="404">Usuário não encontrado.</response>
         [HttpGet("me")]
-        [ProducesResponseType(typeof(Usuario), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ServiceResponse<UsuarioBuscarAutenticadoResposta>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [Authorize]
-        public async Task<IActionResult> GetMe()
+        public async Task<IActionResult> BuscarAutenticado()
         {
-            var username = await _usuarioService.GetMe(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var usuario = await _usuarioService.BuscarAutenticado(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
-            return Ok(new { username.Data });
+            return Ok(usuario);
         }
     }
 }

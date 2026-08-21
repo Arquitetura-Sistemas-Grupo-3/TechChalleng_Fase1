@@ -2,7 +2,7 @@ using System;
 
 namespace Core.Output
 {
-    public class UsuarioMeReturn
+    public class UsuarioBuscarPorIdResposta
     {
         public int Id { get; set; }
         public DateTime DataCriacao { get; set; }

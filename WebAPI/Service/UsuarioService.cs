@@ -18,11 +18,11 @@ namespace WebAPI.Service
             _logger = logger;
         }
 
-        public async Task<ServiceResponse<List<UsuarioGetAllReturn>>> GetAll(string? Nome = null, string? Email = null, string? NivelAcesso = null)
+        public async Task<ServiceResponse<List<UsuarioListarResposta>>> Listar(string? Nome = null, string? Email = null, string? NivelAcesso = null)
         {
             _logger.LogInformation("Buscando usuários com filtros Nome={Nome}, Email={Email}, NivelAcesso={NivelAcesso}", Nome, Email, NivelAcesso);
 
-            var usuario = await _usuarioRepository.GetAllUsuario();
+            var usuario = await _usuarioRepository.ListarUsuario();
 
             if (usuario == null)
                 throw new ExcepetionUsuarioNaoEncontrado("Nenhum usuário encontrado");
@@ -44,10 +44,10 @@ namespace WebAPI.Service
 
             _logger.LogInformation("Retornados {Count} usuários", usuario.Count);
 
-            return ServiceResponse<List<UsuarioGetAllReturn>>.Ok(usuario);
+            return ServiceResponse<List<UsuarioListarResposta>>.Ok(usuario);
         }
 
-        public async Task<ServiceResponse<UsuarioAddReturn>> AddUsuario(UsuarioInput usuarioInput,int idNivelAcesso)
+        public async Task<ServiceResponse<UsuarioAdicionarResposta>> AdicionarUsuario(UsuarioAdicionarRequisicao usuarioInput,int idNivelAcesso)
         {
             _logger.LogInformation("Adicionando usuário com e-mail {Email}", usuarioInput.Email);
 
@@ -68,13 +68,13 @@ namespace WebAPI.Service
             try
             {
                 var user = new Usuario();
-                user = user.AddUsuario(usuarioInput,idNivelAcesso ,senha);
+                user = user.AdicionarUsuario(usuarioInput,idNivelAcesso ,senha);
 
                 _usuarioRepository.Add(user);
 
                 _logger.LogInformation("Usuário {Email} adicionado com sucesso, Id={Id}", usuarioInput.Email, user.Id);
 
-                return ServiceResponse<UsuarioAddReturn>.Ok(new UsuarioAddReturn { Id = user.Id }, "Usuário adicionado com sucesso");
+                return ServiceResponse<UsuarioAdicionarResposta>.Ok(new UsuarioAdicionarResposta { Id = user.Id }, "Usuário adicionado com sucesso");
             }
             catch (Exception ex)
             {
@@ -83,19 +83,19 @@ namespace WebAPI.Service
             }
 
         }
-        public async Task<ServiceResponse<UsuarioGetByIdReturn>> GetById(int id)
+        public async Task<ServiceResponse<UsuarioBuscarPorIdResposta>> BuscarPorId(int id)
         {
             _logger.LogInformation("Buscando usuário {Id}", id);
 
-            var usuario = await _usuarioRepository.GetUsuarioById(id);
+            var usuario = await _usuarioRepository.BuscarUsuarioPorId(id);
 
             if (usuario == null)
                 throw new ExcepetionUsuarioNaoEncontrado("Usuário não encontrado");
 
-            return ServiceResponse<UsuarioGetByIdReturn>.Ok(usuario);
+            return ServiceResponse<UsuarioBuscarPorIdResposta>.Ok(usuario);
         }
 
-        public async Task<ServiceResponse> UpdateUsuario(UsuarioUpdate usuarioUpdate, int id)
+        public async Task<ServiceResponse> AtualizarUsuario(UsuarioAtualizarRequisicao usuarioUpdate, int id)
         {
             _logger.LogInformation("Atualizando usuário {Id}", id);
 
@@ -117,7 +117,7 @@ namespace WebAPI.Service
             return ServiceResponse.Ok("Usuário atualizado com sucesso");
         }
 
-        public async Task<ServiceResponse> DeleteUsuario(int id)
+        public async Task<ServiceResponse> RemoverUsuario(int id)
         {
             _logger.LogInformation("Removendo usuário {Id}", id);
 
@@ -134,16 +134,16 @@ namespace WebAPI.Service
             return ServiceResponse.Ok("Deletado com sucesso");
         }
 
-        public async Task<ServiceResponse<UsuarioMeReturn>> GetMe(string email)
+        public async Task<ServiceResponse<UsuarioBuscarAutenticadoResposta>> BuscarAutenticado(string email)
         {
             _logger.LogInformation("Buscando usuário autenticado {Email}", email);
 
-            var usuario = await _usuarioRepository.GetUsuarioByEmail(email);
+            var usuario = await _usuarioRepository.BuscarUsuarioPorEmail(email);
 
             if (usuario == null)
                 throw new ExcepetionUsuarioNaoEncontrado("Usuário não encontrado");
 
-            return ServiceResponse<UsuarioMeReturn>.Ok(usuario);
+            return ServiceResponse<UsuarioBuscarAutenticadoResposta>.Ok(usuario);
         }
     }
 }

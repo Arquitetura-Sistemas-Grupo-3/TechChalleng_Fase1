@@ -12,9 +12,9 @@ namespace Infra.Repository
     public interface IUsuarioRepository : IRepository<Usuario>
     {
         public Task<Usuario?> ValidaEmailSenha(string email);
-        public Task<List<UsuarioGetAllReturn>> GetAllUsuario();
-        public Task<UsuarioGetByIdReturn?> GetUsuarioById(int id);
+        public Task<List<UsuarioListarResposta>> ListarUsuario();
+        public Task<UsuarioBuscarPorIdResposta?> BuscarUsuarioPorId(int id);
         public Task<Usuario?> ValidaEmail(string email);
-        public Task<UsuarioMeReturn?> GetUsuarioByEmail(string email);
+        public Task<UsuarioBuscarAutenticadoResposta?> BuscarUsuarioPorEmail(string email);
     }
 }
