@@ -65,8 +65,7 @@ namespace WebAPI.Controllers
         public async Task<IActionResult> Add([FromBody] UsuarioInput usuarioInput)
         {
             var usuario = await _usuarioService.AddUsuario(usuarioInput,2);
-
-            return CreatedAtAction(nameof(GetByIdAsync), new { id = usuario.Data.Id }, usuario);
+            return CreatedAtAction("GetById", new { id = usuario.Data.Id }, usuario);
         }
 
         /// <summary>
@@ -82,7 +81,7 @@ namespace WebAPI.Controllers
         {
             var usuario = await _usuarioService.AddUsuario(usuarioInput, 1);
 
-            return CreatedAtAction(nameof(GetByIdAsync), new { id = usuario.Data.Id }, usuario);
+            return CreatedAtAction("GetById", new { id = usuario.Data.Id }, usuario);
         }
 
         /// <summary>

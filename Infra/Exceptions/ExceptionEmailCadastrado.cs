@@ -12,7 +12,7 @@ namespace Infra.Exceptions
         {
         }
 
-        public override int StatusCode { get; set; } = 404;
+        public override int StatusCode { get; set; } = 400;
     }
 }
 
