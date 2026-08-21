@@ -28,15 +28,15 @@ namespace WebAPI.Controllers
         /// <returns>Nome do usuário e token JWT.</returns>
         /// <response code="401">Credenciais inválidas.</response>
         [HttpGet]
-        [ProducesResponseType(typeof(AuthReturn), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> Auth(string email, string password)
+        [ProducesResponseType(typeof(ServiceResponse<AutenticarResposta>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ServiceResponse), StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> Autenticar(string email, string password)
         {
-            AuthReturn? data = await _authService.Login(email, password);
+            var response = await _authService.Autenticar(email, password);
 
-            if (data == null) return Unauthorized();
+            if (!response.Success) return Unauthorized(response);
 
-            return Ok(data);
+            return Ok(response);
         }
     }
 }

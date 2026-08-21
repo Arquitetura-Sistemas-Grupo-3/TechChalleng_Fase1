@@ -101,7 +101,7 @@ builder.Services.AddTransient<CorrelationIdMiddleware>();
 
 builder.Services.AddFluentValidationAutoValidation();
 
-builder.Services.AddValidatorsFromAssemblyContaining<UsuarioInputValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<UsuarioAdicionarRequisicaoValidator>();
 #endregion
 
 #region [Config JWT]

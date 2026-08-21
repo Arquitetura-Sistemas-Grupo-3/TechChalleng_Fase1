@@ -2,8 +2,8 @@
 using FluentValidation;
 
 namespace Core.Validation {
-    public class UsuarioInputValidator : AbstractValidator<UsuarioInput> {
-        public UsuarioInputValidator() {
+    public class UsuarioAdicionarRequisicaoValidator : AbstractValidator<UsuarioAdicionarRequisicao> {
+        public UsuarioAdicionarRequisicaoValidator() {
             RuleFor(x => x.Nome)
                 .NotEmpty().WithMessage("O nome é obrigatório.");
 

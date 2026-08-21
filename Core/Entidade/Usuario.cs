@@ -19,7 +19,7 @@ namespace Core.Entidade
         public ICollection<Jogo> Jogo{ get; set; }
         public NivelAcesso NivelAcesso { get; set; }
 
-        public virtual Usuario AddUsuario(UsuarioInput usuario, int nivelAcessoId,string? password)
+        public virtual Usuario AdicionarUsuario(UsuarioAdicionarRequisicao usuario, int nivelAcessoId,string? password)
         {
             return new Usuario
             {
@@ -30,7 +30,7 @@ namespace Core.Entidade
             };
         }
 
-        public virtual void Atualizar(Usuario usuarioAntigo,UsuarioUpdate usuarioNovo, string? password)
+        public virtual void Atualizar(Usuario usuarioAntigo,UsuarioAtualizarRequisicao usuarioNovo, string? password)
         {
             Nome = string.IsNullOrEmpty(usuarioNovo.Nome) ? usuarioAntigo.Nome : usuarioNovo.Nome;
             Email = string.IsNullOrEmpty(usuarioNovo.Email) ? usuarioAntigo.Email : usuarioNovo.Email;

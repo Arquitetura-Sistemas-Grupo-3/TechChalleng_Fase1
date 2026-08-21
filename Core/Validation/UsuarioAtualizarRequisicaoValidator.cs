@@ -2,8 +2,8 @@
 using FluentValidation;
 
 namespace Core.Validation {
-    public class UsuarioUpdateValidator : AbstractValidator<UsuarioUpdate> {
-        public UsuarioUpdateValidator() {
+    public class UsuarioAtualizarRequisicaoValidator : AbstractValidator<UsuarioAtualizarRequisicao> {
+        public UsuarioAtualizarRequisicaoValidator() {
             When(x => !string.IsNullOrWhiteSpace(x.Nome), () => {
                 RuleFor(x => x.Nome)
                     .NotEmpty().WithMessage("O nome é obrigatório.");
