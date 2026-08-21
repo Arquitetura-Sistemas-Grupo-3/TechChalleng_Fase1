@@ -1,5 +1,6 @@
 ﻿using Core.Entidade;
 using Core.Input;
+using Core.Output;
 using Infra.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -43,7 +44,7 @@ namespace WebAPI.Controllers
         /// <returns>Dados do usuário encontrado.</returns>
         /// <response code="404">Usuário não encontrado.</response>
         [HttpGet("{id}")]
-        [ProducesResponseType(typeof(Usuario), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ServiceResponse<UsuarioGetByIdReturn>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [Authorize(Policy = "Admin")]
         public async Task<IActionResult> GetByIdAsync(int id)
@@ -59,13 +60,13 @@ namespace WebAPI.Controllers
         /// <param name="usuarioInput">Dados do usuário a ser criado.</param>
         /// <returns>Mensagem de confirmação do cadastro.</returns>
         [HttpPost]
-        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ServiceResponse<UsuarioAddReturn>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Add([FromBody] UsuarioInput usuarioInput)
         {
             var usuario = await _usuarioService.AddUsuario(usuarioInput,2);
 
-            return Ok(usuario);
+            return CreatedAtAction(nameof(GetByIdAsync), new { id = usuario.Data.Id }, usuario);
         }
 
         /// <summary>
@@ -74,14 +75,14 @@ namespace WebAPI.Controllers
         /// <param name="usuarioInput">Dados do usuário a ser criado.</param>
         /// <returns>Mensagem de confirmação do cadastro.</returns>
         [HttpPost("admin")]
-        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ServiceResponse<UsuarioAddReturn>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [Authorize(Policy = "Admin")]
         public async Task<IActionResult> AddAdmin([FromBody] UsuarioInput usuarioInput)
         {
             var usuario = await _usuarioService.AddUsuario(usuarioInput, 1);
 
-            return Ok(usuario);
+            return CreatedAtAction(nameof(GetByIdAsync), new { id = usuario.Data.Id }, usuario);
         }
 
         /// <summary>
@@ -91,7 +92,7 @@ namespace WebAPI.Controllers
         /// <returns>Mensagem de confirmação da atualização.</returns>
         /// <response code="404">Usuário não encontrado.</response>
         [HttpPut("{id}")]
-        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ServiceResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [Authorize]
         public async Task<IActionResult> Update([FromBody] UsuarioUpdate usuarioUpdate, [FromRoute] int id)
@@ -107,7 +108,7 @@ namespace WebAPI.Controllers
         /// <returns>Mensagem de confirmação da exclusão.</returns>
         /// <response code="404">Usuário não encontrado.</response>
         [HttpDelete("{id}")]
-        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ServiceResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [Authorize(Policy = "Admin")]
         public async Task<IActionResult> Delete(int id)
@@ -129,7 +130,7 @@ namespace WebAPI.Controllers
         {
             var username = await _usuarioService.GetMe(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
-            return Ok(new { username });
+            return Ok(new { username.Data });
         }
     }
 }

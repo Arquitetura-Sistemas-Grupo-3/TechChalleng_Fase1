@@ -26,29 +26,29 @@ namespace Infra.Repository
             return await _dbSet.FirstOrDefaultAsync(u => u.Email == email);
         }
 
-        public async Task<List<UsuarioReturn>> GetAllUsuario()
+        public async Task<List<UsuarioGetAllReturn>> GetAllUsuario()
         {
             return await _dbSet
                 .Include(u => u.NivelAcesso)
                 .Where(u => u.Ativo)
-                .Select(u => new UsuarioReturn { Id= u.Id, Nome = u.Nome, Email =u.Email,DataCriacao = u.Data, NivelAcesso = u.NivelAcesso.Nome })
+                .Select(u => new UsuarioGetAllReturn { Id= u.Id, Nome = u.Nome, Email =u.Email,DataCriacao = u.Data, NivelAcesso = u.NivelAcesso.Nome })
                 .ToListAsync();
-              
+
         }
 
-        public async Task<UsuarioReturn?> GetUsuarioById(int id)
+        public async Task<UsuarioGetByIdReturn?> GetUsuarioById(int id)
         {
             return await _dbSet
                 .Where(u => u.Ativo)
-                .Select(u => new UsuarioReturn { Id = u.Id, Nome = u.Nome, Email = u.Email, DataCriacao = u.Data, NivelAcesso = u.NivelAcesso.Nome })
+                .Select(u => new UsuarioGetByIdReturn { Id = u.Id, Nome = u.Nome, Email = u.Email, DataCriacao = u.Data, NivelAcesso = u.NivelAcesso.Nome })
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task<UsuarioReturn?> GetUsuarioByEmail(string email)
+        public async Task<UsuarioMeReturn?> GetUsuarioByEmail(string email)
         {
             return await _dbSet
                 .Where(u => u.Email == email)
-                .Select(u => new UsuarioReturn { Id = u.Id, Nome = u.Nome, Email = u.Email, DataCriacao = u.Data, NivelAcesso = u.NivelAcesso.Nome })
+                .Select(u => new UsuarioMeReturn { Id = u.Id, Nome = u.Nome, Email = u.Email, DataCriacao = u.Data, NivelAcesso = u.NivelAcesso.Nome })
                 .FirstOrDefaultAsync();
         }
     }

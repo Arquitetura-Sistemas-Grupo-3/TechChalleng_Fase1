@@ -5,6 +5,6 @@ namespace WebAPI.Interface
 {
     public interface IAuthService
     {
-        Task<AuthReturn?> Login(string email, string password);
+        Task<ServiceResponse<AuthReturn>> Login(string email, string password);
     }
 }

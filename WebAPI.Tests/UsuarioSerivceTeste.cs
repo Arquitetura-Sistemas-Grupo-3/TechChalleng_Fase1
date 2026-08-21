@@ -19,13 +19,14 @@ namespace WebAPI.Tests
         {
          
             var mockUsuarioService = new Mock<IUsuarioService>();
-            mockUsuarioService.Setup(service => service.AddUsuario(It.IsAny<UsuarioInput>(), It.IsAny<int>())).ReturnsAsync("Usuário adicionado com sucesso");
+            mockUsuarioService.Setup(service => service.AddUsuario(It.IsAny<UsuarioInput>(), It.IsAny<int>())).ReturnsAsync(ServiceResponse<UsuarioAddReturn>.Ok(new UsuarioAddReturn { Id = 1 }, "Usuário adicionado com sucesso"));
             var usuarioService = mockUsuarioService.Object;
 
             int nivelAcessoId = 1;
             var resultado = usuarioService.AddUsuario(new UsuarioInput { Email = "ju@gmail.com", Nome = "ju.hernandesmh@gmail", Senha = "123" }, nivelAcessoId);
-          
-            Assert.Equal("Usuário adicionado com sucesso", resultado.Result);
+
+            Assert.True(resultado.Result.Success);
+            Assert.Equal("Usuário adicionado com sucesso", resultado.Result.Message);
         }
 
 
@@ -71,12 +72,13 @@ namespace WebAPI.Tests
         {
            
             var mockUsuarioService = new Mock<IUsuarioService>();
-            mockUsuarioService.Setup(service => service.AddUsuario(It.IsAny<UsuarioInput>(),It.IsAny<int>())).ReturnsAsync("Erro ao adicionar usuário");
+            mockUsuarioService.Setup(service => service.AddUsuario(It.IsAny<UsuarioInput>(),It.IsAny<int>())).ReturnsAsync(ServiceResponse<UsuarioAddReturn>.Fail("Erro ao adicionar usuário"));
             var usuarioService = mockUsuarioService.Object;
-           
+
             var resultado = usuarioService.AddUsuario(new UsuarioInput { Email = "ju", Nome = "ju", Senha = "" },3);
 
-            Assert.Equal("Erro ao adicionar usuário", resultado.Result);
+            Assert.False(resultado.Result.Success);
+            Assert.Equal("Erro ao adicionar usuário", resultado.Result.Message);
 
         }
 
@@ -86,26 +88,26 @@ namespace WebAPI.Tests
         {
           
             var mockUsuarioService = new Mock<IUsuarioService>();
-            mockUsuarioService.Setup(service => service.GetAll(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string?>() )).ReturnsAsync(new List<UsuarioReturn>
+            mockUsuarioService.Setup(service => service.GetAll(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string?>() )).ReturnsAsync(ServiceResponse<List<UsuarioGetAllReturn>>.Ok(new List<UsuarioGetAllReturn>
                 {
-                    new UsuarioReturn
+                    new UsuarioGetAllReturn
                     {
                         Id = 1,
                         Nome = "Juli",
                         Email = "juli@gmail.com",
                         NivelAcesso = "Admin"
                     }
-                });
+                }));
 
             var usuarioService = mockUsuarioService.Object;
 
-           
+
             var resultado = usuarioService.GetAll().Result;
 
-       
-            Assert.NotNull(resultado);
-            Assert.Single(resultado);
-            Assert.Equal("Juli", resultado[0].Nome);
+
+            Assert.NotNull(resultado.Data);
+            Assert.Single(resultado.Data);
+            Assert.Equal("Juli", resultado.Data[0].Nome);
         }
 
         [Fact(DisplayName = "Validação de retorno do usuário por ID")]
@@ -114,19 +116,19 @@ namespace WebAPI.Tests
         {
           
             var mockUsuarioService = new Mock<IUsuarioService>();
-            mockUsuarioService.Setup(service => service.GetById(1)).ReturnsAsync(new Core.Output.UsuarioReturn
+            mockUsuarioService.Setup(service => service.GetById(1)).ReturnsAsync(ServiceResponse<UsuarioGetByIdReturn>.Ok(new Core.Output.UsuarioGetByIdReturn
             {
                 Id = 1,
                 Nome = "Juli"
 
-            });
+            }));
 
             var usuario = mockUsuarioService.Object;
 
             var resultado = usuario.GetById(1).Result;
 
-            Assert.NotNull(resultado);
-            Assert.Equal(1, resultado.Id);
+            Assert.NotNull(resultado.Data);
+            Assert.Equal(1, resultado.Data.Id);
         }
 
         [Fact(DisplayName = "Validação de retorno do usuário por ID com erro")]
@@ -151,12 +153,13 @@ namespace WebAPI.Tests
         {
           
             var mockUsuarioService = new Mock<IUsuarioService>();
-            mockUsuarioService.Setup(service => service.UpdateUsuario(It.IsAny<UsuarioUpdate>(),1)).ReturnsAsync("Usuário atualizado com sucesso");
+            mockUsuarioService.Setup(service => service.UpdateUsuario(It.IsAny<UsuarioUpdate>(),1)).ReturnsAsync(ServiceResponse.Ok("Usuário atualizado com sucesso"));
             var usuarioService = mockUsuarioService.Object;
-       
+
             var usuario = await usuarioService.UpdateUsuario(new UsuarioUpdate {Nome = "Juli", Email = "ju.hernandesmh@gmail.com", NivelAcessoId = 1, Senha = "123" },1);
 
-            Assert.Equal("Usuário atualizado com sucesso", usuario);
+            Assert.True(usuario.Success);
+            Assert.Equal("Usuário atualizado com sucesso", usuario.Message);
         }
 
         [Fact(DisplayName = "Validação de deleção")]
@@ -164,13 +167,14 @@ namespace WebAPI.Tests
         public void Delete_ShouldReturnDelete()
         {
             var mockUsuarioService = new Mock<IUsuarioService>();
-            mockUsuarioService.Setup(service => service.DeleteUsuario(1)).ReturnsAsync("Deletado com sucesso");
+            mockUsuarioService.Setup(service => service.DeleteUsuario(1)).ReturnsAsync(ServiceResponse.Ok("Deletado com sucesso"));
 
             var usuarioService = mockUsuarioService.Object;
 
             var usuario = usuarioService.DeleteUsuario(1);
 
-            Assert.Equal("Deletado com sucesso", usuario.Result);
+            Assert.True(usuario.Result.Success);
+            Assert.Equal("Deletado com sucesso", usuario.Result.Message);
         }
     }
 }
