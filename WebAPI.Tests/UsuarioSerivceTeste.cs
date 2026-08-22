@@ -34,21 +34,7 @@ namespace WebAPI.Tests
         [Fact(DisplayName = "Validação de criação de usuário")]
         [Trait("Categoria", "Validação Usuário")]
         public async Task Create_ShouldReturnSuccessMessage()
-        {/*
-         
-            var mockUsuarioService = new Mock<IUsuarioService>();
-            mockUsuarioService.Setup(service => service.AdicionarUsuario(It.IsAny<UsuarioAdicionarRequisicao>(), It.IsAny<int>())).ReturnsAsync(ServiceResponse<UsuarioAdicionarResposta>.Ok(new UsuarioAdicionarResposta { Id = 1 }, "Usuário adicionado com sucesso"));
-            var usuarioService = mockUsuarioService.Object;
-
-            var mock = _usuarioRepository.Setup(repo => repo.ValidaEmail(It.IsAny<string>())).ReturnsAsync((Usuario?)null);
-
-                var usuarioRequisicao = _usuarioAdicionarRequisicao.Setup(f => new UsuarioAdicionarRequisicao
-                {
-                    Nome = "Juliana",
-                    Email = "ju.hernandesmh@gmail.com",
-                    Senha = "203040#@!As"
-                });*/
-
+        {
             var usuarioRequisicao = new Usuario
             {
                 Nome = "Juliana",
@@ -59,9 +45,6 @@ namespace WebAPI.Tests
             _usuarioRepository.Setup(repo => repo.Add(usuarioRequisicao)).CallBase();
 
             var retorno = await _serviceUsuario.AdicionarUsuario(new UsuarioAdicionarRequisicao { Email = "julianamenezeshernandes@gmail.com", Nome = "Juliana", Senha = "203040#@!Asd" }, 1);
-
-            //  int nivelAcessoId = 1;
-            //    var resultado = usuarioService.AdicionarUsuario(new UsuarioAdicionarRequisicao { Email = "ju@gmail.com", Nome = "ju.hernandesmh@gmail", Senha = "123" }, nivelAcessoId);
 
             Assert.True(retorno.Success);
             Assert.Equal("Usuário adicionado com sucesso", retorno.Message);
