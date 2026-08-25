@@ -8,6 +8,7 @@ using WebAPI.Interface;
 using Core.Input;
 using Core.Entidade;
 using Core.Output;
+using Core.ValueObjects;
 
 namespace WebAPI.Tests
 {
@@ -36,7 +37,7 @@ namespace WebAPI.Tests
         {
             var moackUsuario = new Mock<Usuario>();
 
-            moackUsuario.Setup( u=> u.AdicionarUsuario(It.IsAny<UsuarioAdicionarRequisicao>(),It.IsAny<int>(), It.IsAny<string>())).Returns(new Usuario { Nome = "Juli", Email = "",  Senha = "123", NivelAcessoId = 1 });
+            moackUsuario.Setup( u=> u.AdicionarUsuario(It.IsAny<UsuarioAdicionarRequisicao>(),It.IsAny<int>(), It.IsAny<string>())).Returns(new Usuario { Nome = "Juli", Email = new Email("juli@gmail.com"),  Senha = "123", NivelAcessoId = 1 });
 
             var usuario = moackUsuario.Object;
             var resultado = usuario.AdicionarUsuario(new UsuarioAdicionarRequisicao { Nome = "", Email = "", Senha = "" }, 1, "");
@@ -55,13 +56,13 @@ namespace WebAPI.Tests
             moackUsuario.Setup(u => u.Atualizar(It.IsAny<Usuario>(), It.IsAny<UsuarioAtualizarRequisicao>(), It.IsAny<string>())).Callback<Usuario,UsuarioAtualizarRequisicao, string>((usuario, usuarioAntigo, nome) => 
             { 
                 usuario.Nome = "Ju";
-                usuario.Email = "ju.hernandesmh@gmail.com";
+                usuario.Email = new Email("ju.hernandesmh@gmail.com");
                 usuario.Senha = "123";
                 usuario.NivelAcessoId =1;
             });
 
             var usuario = moackUsuario.Object;
-            usuario.Atualizar(new Usuario { Nome = "Juli", Email = "ju.hernandesmh@gmail.com", Senha = "123", NivelAcessoId = 1 }, new UsuarioAtualizarRequisicao { Nome = "Juli", Email = "", Senha = "", NivelAcessoId = 1 }, "");
+            usuario.Atualizar(new Usuario { Nome = "Juli", Email = new Email("ju.hernandesmh@gmail.com"), Senha = "123", NivelAcessoId = 1 }, new UsuarioAtualizarRequisicao { Nome = "Juli", Email = "", Senha = "", NivelAcessoId = 1 }, "");
             
             moackUsuario.Verify(u => u.Atualizar(It.IsAny<Usuario>(), It.IsAny<UsuarioAtualizarRequisicao>(), It.IsAny<string>()), Times.Once);
         }
