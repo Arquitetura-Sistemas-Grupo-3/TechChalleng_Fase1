@@ -8,7 +8,7 @@ namespace WebAPI.Interface
     {
         public Task<ServiceResponse<List<UsuarioListarResposta>>> Listar(string? nome = null, string? email = null, string? nivelAcessoId = null);
 
-        public Task<ServiceResponse<UsuarioAdicionarResposta>> AdicionarUsuario(UsuarioAdicionarRequisicao usuarioInput,int nivelAcessoId);
+        public Task<ServiceResponse<UsuarioAdicionarResposta>> AdicionarUsuario(UsuarioAdicionarRequisicao usuarioInput, NivelAcessoEnum nivelAcesso);
 
         public Task<ServiceResponse<UsuarioBuscarPorIdResposta>> BuscarPorId(int id);
 

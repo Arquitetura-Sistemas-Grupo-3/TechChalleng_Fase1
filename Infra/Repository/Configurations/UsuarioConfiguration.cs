@@ -29,6 +29,18 @@ namespace Infra.Repository.Configurations
                 .WithMany(u => u.Usuario)
                 .HasForeignKey(u => u.NivelAcessoId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasData(new Usuario {
+                Id = 1,
+                Nome = "admin",
+                Email = new Email("admin@gmail.com"),
+                Senha = "$2a$11$/pStnQtIExzkwxiUM5r5yOmT972StJfW5M.j34r4xwPNerS6mSStC",
+                NivelAcessoId = (int)NivelAcessoEnum.Admin,
+                Data = new DateTime(2026, 1, 1)
+            });
+
         }
+
+
     }
 }

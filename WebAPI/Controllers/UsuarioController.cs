@@ -64,7 +64,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Adicionar([FromBody] UsuarioAdicionarRequisicao usuarioInput)
         {
-            var usuario = await _usuarioService.AdicionarUsuario(usuarioInput,2);
+            var usuario = await _usuarioService.AdicionarUsuario(usuarioInput, NivelAcessoEnum.Usuario);
             return CreatedAtAction("BuscarPorId", new { id = usuario.Data.Id }, usuario);
         }
 
@@ -79,7 +79,7 @@ namespace WebAPI.Controllers
         [Authorize(Policy = "Admin")]
         public async Task<IActionResult> AdicionarAdmin([FromBody] UsuarioAdicionarRequisicao usuarioInput)
         {
-            var usuario = await _usuarioService.AdicionarUsuario(usuarioInput, 1);
+            var usuario = await _usuarioService.AdicionarUsuario(usuarioInput, NivelAcessoEnum.Admin);
 
             return CreatedAtAction("BuscarPorId", new { id = usuario.Data.Id }, usuario);
         }

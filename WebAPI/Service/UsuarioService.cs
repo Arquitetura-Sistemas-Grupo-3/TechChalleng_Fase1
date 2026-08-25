@@ -47,7 +47,7 @@ namespace WebAPI.Service
             return ServiceResponse<List<UsuarioListarResposta>>.Ok(usuario);
         }
 
-        public async Task<ServiceResponse<UsuarioAdicionarResposta>> AdicionarUsuario(UsuarioAdicionarRequisicao usuarioInput,int idNivelAcesso)
+        public async Task<ServiceResponse<UsuarioAdicionarResposta>> AdicionarUsuario(UsuarioAdicionarRequisicao usuarioInput, NivelAcessoEnum nivelAcesso)
         {
             _logger.LogInformation("Adicionando usuário com e-mail {Email}", usuarioInput.Email);
 
@@ -68,7 +68,7 @@ namespace WebAPI.Service
             try
             {
                 var user = new Usuario();
-                user = user.AdicionarUsuario(usuarioInput,idNivelAcesso ,senha);
+                user = user.AdicionarUsuario(usuarioInput, nivelAcesso, senha);
 
                 _usuarioRepository.Add(user);
 
