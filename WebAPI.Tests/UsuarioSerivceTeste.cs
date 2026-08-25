@@ -2,6 +2,12 @@
 using Core.Input;
 using Core.Output;
 using Core.ValueObjects;
+using Infra.Exceptions;
+using Infra.Repository;
+using Microsoft.Extensions.Logging;
+using Moq;
+using WebAPI.Service;
+
 
 namespace WebAPI.Tests
 {
@@ -112,7 +118,7 @@ namespace WebAPI.Tests
 
             _usuarioRepository
                 .Setup(repo => repo.GetById(idUsuario))
-                .ReturnsAsync(new Usuario { Email = "", Nome = "" });
+                .ReturnsAsync(new Usuario { Email = new Email("email@email.com"), Nome = "" });
 
 
             Usuario usuarioAtualizado = null;
@@ -130,7 +136,7 @@ namespace WebAPI.Tests
 
             Assert.NotNull(usuarioAtualizado);
             Assert.Equal(usuarioAtualizarRequisicao.Nome, usuarioAtualizado.Nome);
-            Assert.Equal(usuarioAtualizarRequisicao.Email, usuarioAtualizado.Email);
+            Assert.Equal(usuarioAtualizarRequisicao.Email, usuarioAtualizado.Email.Endereco);
             Assert.NotEqual(usuarioAtualizarRequisicao.Senha, usuarioAtualizado.Senha);
 
             _usuarioRepository.Verify(r => r.GetById(idUsuario), Times.Once);
@@ -201,7 +207,7 @@ namespace WebAPI.Tests
             var usuario = new Usuario
             {
                 Nome = "Juliana",
-                Email = "ju.hernandesmh@gmail.com"
+                Email = new Email("ju.hernandesmh@gmail.com")
             };
 
             _usuarioRepository
