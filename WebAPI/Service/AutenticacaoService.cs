@@ -12,14 +12,14 @@ using WebAPI.Interface;
 
 namespace WebAPI.Service
 {
-    public class AuthService : IAuthService
+    public class AutenticacaoService : IAuthService
     {
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly INivelAcessoRepository _nivelAcessoRepository;
         private readonly IConfiguration _configuration;
-        private readonly ILogger<AuthService> _logger;
+        private readonly ILogger<AutenticacaoService> _logger;
 
-        public AuthService(IUsuarioRepository usuarioRepository, INivelAcessoRepository nivelAcessoRepository, IConfiguration configuration, ILogger<AuthService> logger)
+        public AutenticacaoService(IUsuarioRepository usuarioRepository, INivelAcessoRepository nivelAcessoRepository, IConfiguration configuration, ILogger<AutenticacaoService> logger)
         {
             _usuarioRepository = usuarioRepository;
             _nivelAcessoRepository = nivelAcessoRepository;
