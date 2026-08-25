@@ -41,7 +41,7 @@ namespace WebAPI.Service
 
             NivelAcesso acesso = await _nivelAcessoRepository.GetById(usuario.NivelAcessoId);
 
-            string jwt = GerarJWT(usuario.Email.Endereco, acesso.Nome);
+            string jwt = GerarJWT(usuario.Email, acesso.Nome);
 
             AutenticarResposta auth = new AutenticarResposta
             {

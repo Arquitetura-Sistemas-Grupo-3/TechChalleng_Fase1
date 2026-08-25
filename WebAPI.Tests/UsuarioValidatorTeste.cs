@@ -1,9 +1,4 @@
 ﻿using Core.Validation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Core.Input;
 using FluentAssertions;
 
@@ -18,7 +13,7 @@ namespace WebAPI.Tests
             validation = new UsuarioAdicionarRequisicaoValidator();
         }
 
-        [Fact(DisplayName = "Validação e-mail empty")]
+        [Fact(DisplayName = "Validação - e-mail empty")]
         [Trait("Validação", "Usuário")]
         public void Validator_ShouldReturnEmailErrorMessage()
         {
@@ -28,7 +23,7 @@ namespace WebAPI.Tests
           
         }
 
-        [Fact(DisplayName = "Validação e-mail inválido")]
+        [Fact(DisplayName = "Validação - e-mail inválido")]
         [Trait("Validação", "Usuário")]
         public void Validator_ShouldReturnEmailInvalidErrorMessage()
         {
@@ -37,7 +32,7 @@ namespace WebAPI.Tests
             resultado.Errors.Should().Contain(e => e.ErrorMessage == "Formato de e-mail inválido.");
         }
 
-        [Fact(DisplayName = "Validação senha inválida caracteres")]
+        [Fact(DisplayName = "Validação - senha inválida")]
         [Trait("Validação", "Usuário")]
         public void Validator_ShouldReturnPasswodErrorMessage()
         { 
@@ -51,12 +46,27 @@ namespace WebAPI.Tests
             resultado.Errors.Should().Contain(e => e.ErrorMessage == "A senha deve conter ao menos um número.");
         }
 
-        [Fact(DisplayName = "Validação nome vazio")]
+        [Fact(DisplayName = "Validação - nome vazio")]
         [Trait("Validação", "Usuário")]
         public void Validator_ShouldReturnNomeErrorMessage()
         {
             var resultado = validation.Validate(new UsuarioAdicionarRequisicao { Email = "", Nome = "", Senha = "" });
             resultado.Errors.Should().Contain(e => e.ErrorMessage == "O nome é obrigatório.");
+        }
+
+        [Fact(DisplayName = "Validação - dados válidos não geram erros")]
+        [Trait("Validação", "Usuário")]
+        public void Validator_QuandoDadosValidos_NaoDeveRetornarErros()
+        {
+            var resultado = validation.Validate(new UsuarioAdicionarRequisicao
+            {
+                Nome = "Juliana",
+                Email = "juliana@gmail.com",
+                Senha = "SenhaForte123!"
+            });
+
+            resultado.IsValid.Should().BeTrue();
+            resultado.Errors.Should().BeEmpty();
         }
 
     }
