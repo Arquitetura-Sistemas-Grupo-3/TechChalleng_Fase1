@@ -1,11 +1,7 @@
 ﻿using Core.Entidade;
 using Core.Input;
 using Core.Output;
-using Infra.Exceptions;
-using Infra.Repository;
-using Microsoft.Extensions.Logging;
-using Moq;
-using WebAPI.Service;
+using Core.ValueObjects;
 
 namespace WebAPI.Tests
 {
