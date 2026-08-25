@@ -16,10 +16,10 @@ namespace WebAPI.Controllers
     [ApiController]
     [Route("[controller]")]
     [Produces("application/json")]
-    public class UsuarioControler : Controller
+    public class UsuarioController : Controller
     {
         private IUsuarioService _usuarioService;
-        public UsuarioControler(IUsuarioService usuarioService)
+        public UsuarioController(IUsuarioService usuarioService)
         {
             _usuarioService = usuarioService;
         }
