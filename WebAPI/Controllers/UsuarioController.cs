@@ -93,7 +93,7 @@ namespace WebAPI.Controllers
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(ServiceResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        [Authorize]
+        [Authorize(Policy = "Admin")]
         public async Task<IActionResult> Atualizar([FromBody] UsuarioAtualizarRequisicao usuarioUpdate, [FromRoute] int id)
         {
             var usuario = await _usuarioService.AtualizarUsuario(usuarioUpdate, id);
