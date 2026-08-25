@@ -11,11 +11,11 @@ namespace WebAPI.Controllers
     [ApiController]
     [Route("[controller]")]
     [Produces("application/json")]
-    public class AuthController : ControllerBase
+    public class AutenticacaoController : ControllerBase
     {
         private readonly IAuthService _authService;
 
-        public AuthController(IAuthService authService)
+        public AutenticacaoController(IAuthService authService)
         {
             _authService = authService;
         }
