@@ -1,4 +1,5 @@
 ﻿using Core.Entidade;
+using Core.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
@@ -17,7 +18,10 @@ namespace Infra.Repository.Configurations
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id).HasColumnType("INT").UseIdentityColumn();
             builder.Property(x => x.Nome).IsRequired().HasMaxLength(100);
-            builder.Property(x => x.Email).IsRequired().HasMaxLength(100);
+            builder.Property(x => x.Email)
+                .IsRequired()
+                .HasMaxLength(100)
+                .HasConversion(email => email.Endereco, valor => new Email(valor));
             builder.Property(x => x.Senha).IsRequired().HasMaxLength(100);
             builder.Property(x => x.NivelAcessoId).HasColumnType("INT").IsRequired();
 

@@ -16,10 +16,10 @@ namespace WebAPI.Controllers
     [ApiController]
     [Route("[controller]")]
     [Produces("application/json")]
-    public class UsuarioControler : Controller
+    public class UsuarioController : Controller
     {
         private IUsuarioService _usuarioService;
-        public UsuarioControler(IUsuarioService usuarioService)
+        public UsuarioController(IUsuarioService usuarioService)
         {
             _usuarioService = usuarioService;
         }
@@ -93,7 +93,7 @@ namespace WebAPI.Controllers
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(ServiceResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        [Authorize]
+        [Authorize(Policy = "Admin")]
         public async Task<IActionResult> Atualizar([FromBody] UsuarioAtualizarRequisicao usuarioUpdate, [FromRoute] int id)
         {
             var usuario = await _usuarioService.AtualizarUsuario(usuarioUpdate, id);

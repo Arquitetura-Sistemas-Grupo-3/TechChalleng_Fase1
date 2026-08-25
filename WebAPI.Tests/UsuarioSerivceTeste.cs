@@ -1,20 +1,13 @@
 ﻿using Core.Entidade;
 using Core.Input;
 using Core.Output;
-using Core.Repository;
+using Core.ValueObjects;
 using Infra.Exceptions;
 using Infra.Repository;
 using Microsoft.Extensions.Logging;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using WebAPI.Interface;
 using WebAPI.Service;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Model;
+
 
 namespace WebAPI.Tests
 {
@@ -23,7 +16,6 @@ namespace WebAPI.Tests
         private readonly Mock<IUsuarioRepository> _usuarioRepository;
         private readonly Mock<ILogger<UsuarioService>> _logger;
         private readonly UsuarioService _serviceUsuario;
-        private readonly Mock<UsuarioAdicionarRequisicao> _usuarioAdicionarRequisicao;
         public UsuarioSerivceTeste()
         {
             _usuarioRepository = new Mock<IUsuarioRepository>();
@@ -31,27 +23,44 @@ namespace WebAPI.Tests
             _serviceUsuario = new UsuarioService(_usuarioRepository.Object, _logger.Object);
         }
 
-        [Fact(DisplayName = "Validação de criação de usuário")]
-        [Trait("Categoria", "Validação Usuário")]
+        [Fact(DisplayName = "Criação de Usuario - Sucesso")]
+        [Trait("Categoria", "Criacao")]
         public async Task Create_ShouldReturnSuccessMessage()
         {
-            var usuarioRequisicao = new Usuario
+            var usuarioRequisicao = new UsuarioAdicionarRequisicao
             {
                 Nome = "Juliana",
                 Email = "ju.hernandesmh@gmail.com",
                 Senha = "203040#@!Asd"
             };
 
-            _usuarioRepository.Setup(repo => repo.Add(usuarioRequisicao)).CallBase();
+            _usuarioRepository
+                .Setup(r => r.ValidaEmail(usuarioRequisicao.Email))
+                .ReturnsAsync((Usuario)null);
 
-            var retorno = await _serviceUsuario.AdicionarUsuario(new UsuarioAdicionarRequisicao { Email = "julianamenezeshernandes@gmail.com", Nome = "Juliana", Senha = "203040#@!Asd" }, 1);
+            Usuario usuarioAdicionado = null;
+            _usuarioRepository
+                .Setup(r => r.Add(It.IsAny<Usuario>()))
+                .Callback<Usuario>( u =>
+                {
+                    u.Id = 42; //Id gerado pelo banco
+                    usuarioAdicionado = u;
+                });
+
+            var retorno = await _serviceUsuario.AdicionarUsuario(usuarioRequisicao, idNivelAcesso: 1);
 
             Assert.True(retorno.Success);
             Assert.Equal("Usuário adicionado com sucesso", retorno.Message);
+
+            Assert.NotNull(usuarioAdicionado);
+            Assert.NotEqual(usuarioRequisicao.Senha, usuarioAdicionado.Senha);
+
+            _usuarioRepository.Verify(r => r.ValidaEmail(usuarioRequisicao.Email), Times.Once);
+            _usuarioRepository.Verify(r => r.Add(It.IsAny<Usuario>()), Times.Once);
         }
 
-        [Fact(DisplayName = "Validação de criação de usuário com e-mail já existente")]
-        [Trait("Categoria", "Validação Usuário")]
+        [Fact(DisplayName = "Criação de Usuario - E-mail existente")]
+        [Trait("Categoria", "Criacao")]
         public async Task Create_ShouldReturnErrorMessageForExistingEmail()
         {
             var usuarioRequisicao = new UsuarioAdicionarRequisicao
@@ -61,15 +70,20 @@ namespace WebAPI.Tests
                 Senha = "203040#@!Asd"
             };
 
-            _usuarioRepository.Setup(repo => repo.ValidaEmail(usuarioRequisicao.Email)).ReturnsAsync(new Usuario { Email = usuarioRequisicao.Email });
+            _usuarioRepository
+                .Setup(repo => repo.ValidaEmail(usuarioRequisicao.Email))
+                .ReturnsAsync(new Usuario());
 
-            Assert.ThrowsAsync<ExceptionEmailCadastrado>(() => _serviceUsuario.AdicionarUsuario(usuarioRequisicao, 1));
+            await Assert.ThrowsAsync<ExceptionEmailCadastrado>(() => _serviceUsuario.AdicionarUsuario(usuarioRequisicao, idNivelAcesso: 1));
+
+            // Garante que o Add nunca foi chamado nesse cenário
+            _usuarioRepository.Verify(r => r.Add(It.IsAny<Usuario>()), Times.Never);
         }
 
 
-        [Fact(DisplayName = "Validação em senha vazia")]
-        [Trait("Categoria", "Validação Usuário")]
-        public void Validator_ShouldReturnPasswordEmptyErrorMessage()
+        [Fact(DisplayName = "Criação de Usuario - Senha vazia")]
+        [Trait("Categoria", "Criacao")]
+        public async Task Validator_ShouldReturnPasswordEmptyErrorMessage()
         {
             var usuarioRequisicao = new UsuarioAdicionarRequisicao
             {
@@ -78,14 +92,22 @@ namespace WebAPI.Tests
                 Senha = ""
             };
 
-            Assert.ThrowsAsync<ExceptionSenhaInvalida>(() => _serviceUsuario.AdicionarUsuario(usuarioRequisicao, 1));
 
+            _usuarioRepository
+                .Setup(r => r.ValidaEmail(usuarioRequisicao.Email))
+                .ReturnsAsync((Usuario)null);
+
+
+            await Assert.ThrowsAsync<ExceptionSenhaInvalida>(() => _serviceUsuario.AdicionarUsuario(usuarioRequisicao, idNivelAcesso: 1));
+
+            _usuarioRepository.Verify(r => r.Add(It.IsAny<Usuario>()), Times.Never);
         }
 
-        [Fact(DisplayName = "Validação de teste de atualização do usuário")]
-        [Trait("Categoria", "Validação Usuário")]
+        [Fact(DisplayName = "Atualização de Usuario - Sucesso")]
+        [Trait("Categoria", "Atualizacao")]
         public async Task Update_ShouldReturnSucess()
         {
+            int idUsuario = 1;
             var usuarioAtualizarRequisicao = new UsuarioAtualizarRequisicao
             {
                 Email = "ju.menezes@gmail.com",
@@ -94,172 +116,284 @@ namespace WebAPI.Tests
                 Nome = "Juli"
             };
 
-            _usuarioRepository.Setup(repo => repo.GetById(1)).ReturnsAsync(new Usuario { Email = "", Nome = "" });
+            _usuarioRepository
+                .Setup(repo => repo.GetById(idUsuario))
+                .ReturnsAsync(new Usuario { Email = new Email("email@email.com"), Nome = "" });
 
-            var retorno = await _serviceUsuario.AtualizarUsuario(usuarioAtualizarRequisicao, 1);
+
+            Usuario usuarioAtualizado = null;
+            _usuarioRepository
+                .Setup(r => r.Update(It.IsAny<Usuario>()))
+                .Callback<Usuario>(u =>
+                {
+                    usuarioAtualizado = u;
+                });
+
+            var retorno = await _serviceUsuario.AtualizarUsuario(usuarioAtualizarRequisicao, idUsuario);
 
             Assert.True(retorno.Success);
             Assert.Equal("Usuário atualizado com sucesso", retorno.Message);
+
+            Assert.NotNull(usuarioAtualizado);
+            Assert.Equal(usuarioAtualizarRequisicao.Nome, usuarioAtualizado.Nome);
+            Assert.Equal(usuarioAtualizarRequisicao.Email, usuarioAtualizado.Email.Endereco);
+            Assert.NotEqual(usuarioAtualizarRequisicao.Senha, usuarioAtualizado.Senha);
+
+            _usuarioRepository.Verify(r => r.GetById(idUsuario), Times.Once);
+            _usuarioRepository.Verify(r => r.Update(It.IsAny<Usuario>()), Times.Once);
         }
 
-        [Fact(DisplayName = "Validação de atualização do usuário com erro")]
-        [Trait("Categoria", "Validação Usuário")]
+        [Fact(DisplayName = "Atualização de Usuario - Usuário Inexistente")]
+        [Trait("Categoria", "Atualizacao")]
         public async Task Update_ShouldReturnErrorMessage()
         {
-            var usuarioAtualizarRequisicao = new UsuarioAtualizarRequisicao
-            {
-                Email = "",
-                Senha = "",
-                Nome = ""
-            };
 
-            _usuarioRepository.Setup(repo => repo.GetById(3)).ReturnsAsync((Usuario?)null);
+            int idInexistente = 3;
+            var usuarioAtualizarRequisicao = new UsuarioAtualizarRequisicao();
 
-            Assert.ThrowsAsync<ExcepetionUsuarioNaoEncontrado>(() => _serviceUsuario.AtualizarUsuario(usuarioAtualizarRequisicao, 1));
+            _usuarioRepository
+                .Setup(repo => repo.GetById(idInexistente))
+                .ReturnsAsync((Usuario?)null);
+
+            await Assert.ThrowsAsync<ExcepetionUsuarioNaoEncontrado>(() => _serviceUsuario.AtualizarUsuario(usuarioAtualizarRequisicao, idInexistente));
+
+            _usuarioRepository.Verify(repo => repo.GetById(idInexistente), Times.Once);
+            _usuarioRepository.Verify(repo => repo.Update(It.IsAny<Usuario>()), Times.Never);
         }
 
-        [Fact(DisplayName = "Validação de retorno do usuário por ID")]
-        [Trait("Categoria", "Validação Usuário")]
+        [Fact(DisplayName = "Busca Usuario por Id - Sucesso")]
+        [Trait("Categoria", "Busca")]
         public async Task GetById_ShouldReturnValueSuccess()
         {
-            _usuarioRepository.Setup(f => f.BuscarUsuarioPorId(1)).ReturnsAsync(new UsuarioBuscarPorIdResposta { Email = "ju.hernandesmh@gmail.com", Nome = "Juliana" });
+            int idExistente = 3;
+            var usuarioEncontrado = new UsuarioBuscarPorIdResposta
+            {
+                Email = "ju.hernandesmh@gmail.com",
+                Nome = "Juliana"
+            };
 
-            var resultado = await _serviceUsuario.BuscarPorId(1);
+
+            _usuarioRepository
+                .Setup(f => f.BuscarUsuarioPorId(idExistente))
+                .ReturnsAsync(usuarioEncontrado);
+
+            var resultado = await _serviceUsuario.BuscarPorId(idExistente);
 
             Assert.True(resultado.Success);
             Assert.Equal("Juliana", resultado.Data.Nome);
             Assert.Equal("ju.hernandesmh@gmail.com", resultado.Data.Email);
+
+            _usuarioRepository.Verify(repo => repo.BuscarUsuarioPorId(idExistente), Times.Once);
         }
 
-        [Fact(DisplayName = "Validação de retorno do usuário por ID com erro")]
-        [Trait("Categoria", "Validação Usuário")]
+        [Fact(DisplayName = "Busca Usuario por Id - Usuário Inexistente")]
+        [Trait("Categoria", "Busca")]
         public async Task GetById_ShouldReturnValueError()
         {
+            int idInexistente = 3;
+            _usuarioRepository
+                .Setup(f => f.BuscarUsuarioPorId(idInexistente))
+                .ReturnsAsync((UsuarioBuscarPorIdResposta?)null);
 
-            _usuarioRepository.Setup(f => f.BuscarUsuarioPorId(3)).ReturnsAsync((UsuarioBuscarPorIdResposta?)null);
-
-            var resultado = _serviceUsuario.BuscarPorId(3);
-
-            Assert.ThrowsAsync<ExcepetionUsuarioNaoEncontrado>(() => _serviceUsuario.BuscarPorId(3));
+            await Assert.ThrowsAsync<ExcepetionUsuarioNaoEncontrado>(() => _serviceUsuario.BuscarPorId(idInexistente));
+            _usuarioRepository.Verify(f => f.BuscarUsuarioPorId(idInexistente), Times.Once);
         }
 
-        [Fact(DisplayName = "Validação de deleção")]
-        [Trait("Categoria", "Validação Usuário")]
+        [Fact(DisplayName = "Deleta Usuário - Sucesso")]
+        [Trait("Categoria", "Delecao")]
         public async Task Delete_ShouldReturnDelete()
         {
-            _usuarioRepository.Setup(f => f.GetById(3)).ReturnsAsync(new Usuario { Id = 3, Nome = "Juliana", Email = "ju.hernandesmh@gmail.com" });
+            int idUsuarioDeletado = 3;
+            var usuario = new Usuario
+            {
+                Nome = "Juliana",
+                Email = new Email("ju.hernandesmh@gmail.com")
+            };
 
-            var resultado = await _serviceUsuario.RemoverUsuario(3);
+            _usuarioRepository
+                .Setup(f => f.GetById(idUsuarioDeletado))
+                .ReturnsAsync(usuario);
+
+            Usuario usuarioDeletado = null;
+            _usuarioRepository
+                .Setup(r => r.Update(It.IsAny<Usuario>()))
+                .Callback<Usuario>(u =>
+                {
+                    usuarioDeletado = u;
+                });
+
+
+            var resultado = await _serviceUsuario.RemoverUsuario(idUsuarioDeletado);
 
             Assert.True(resultado.Success);
             Assert.Equal("Deletado com sucesso", resultado.Message);
+
+            Assert.NotNull(usuarioDeletado);
+            Assert.False(usuarioDeletado.Ativo);
+
+            _usuarioRepository.Verify(repo => repo.GetById(idUsuarioDeletado), Times.Once);
+            _usuarioRepository.Verify(repo => repo.Update(It.IsAny<Usuario>()), Times.Once);
         }
 
-        [Fact(DisplayName = "Validação de deleção com erro")]
-        [Trait("Categoria", "Validação Usuário")]
+        [Fact(DisplayName = "Deleta Usuário - Erro usuário não encontrado")]
+        [Trait("Categoria", "Delecao")]
         public async Task Delete_ShouldReturnError()
         {
-            _usuarioRepository.Setup(f => f.GetById(3)).ReturnsAsync((Usuario?)null);
+            int idInexistente = 3;
+            _usuarioRepository
+                .Setup(f => f.GetById(idInexistente))
+                .ReturnsAsync((Usuario?)null);
 
-            Assert.ThrowsAsync<ExcepetionUsuarioNaoEncontrado>(() => _serviceUsuario.RemoverUsuario(3));
+            await Assert.ThrowsAsync<ExcepetionUsuarioNaoEncontrado>(() => _serviceUsuario.RemoverUsuario(idInexistente));
+
+            _usuarioRepository.Verify(repo => repo.GetById(idInexistente), Times.Once);
         }
 
-        [Fact(DisplayName = "Validação buscar autenticado")]
-        [Trait("Categoria", "Validação Usuário")]
+        [Fact(DisplayName = "Busca usuário para Autenticação - Sucesso")]
+        [Trait("Categoria", "Busca")]
         public async Task Search_ShouldReturnUser()
         {
-            _usuarioRepository.Setup(f => f.BuscarUsuarioPorEmail("ju.hernandesmh@gmail.com")).ReturnsAsync(new UsuarioBuscarAutenticadoResposta { Email = "ju.hernandesmh@gmail.com", Nome = "Juliana" });
+            var usuario = new UsuarioBuscarAutenticadoResposta
+            {
+                Email = "ju.hernandesmh@gmail.com",
+                Nome = "Juliana"
+            };
 
-            var resultado = await _serviceUsuario.BuscarAutenticado("ju.hernandesmh@gmail.com");
+            _usuarioRepository
+                .Setup(f => f.BuscarUsuarioPorEmail(usuario.Email))
+                .ReturnsAsync(usuario);
+
+            var resultado = await _serviceUsuario.BuscarAutenticado(usuario.Email);
 
             Assert.True(resultado.Success);
             Assert.Equal("Juliana", resultado.Data.Nome);
             Assert.Equal("ju.hernandesmh@gmail.com", resultado.Data.Email);
+
+            _usuarioRepository.Verify(repo => repo.BuscarUsuarioPorEmail(usuario.Email), Times.Once);
         }
 
-        [Fact(DisplayName = "Validação em buscar autenticado com erro")]
-        [Trait("Categoria", "Validação Usuário")]
+        [Fact(DisplayName = "Busca usuário para Autenticação - Usuário não encontrado")]
+        [Trait("Categoria", "Busca")]
         public async Task Search_ShouldReturnError()
-        {
-            _usuarioRepository.Setup(f => f.BuscarUsuarioPorEmail("")).ReturnsAsync((UsuarioBuscarAutenticadoResposta?)null);
-
-            Assert.ThrowsAsync<ExcepetionUsuarioNaoEncontrado>(() => _serviceUsuario.BuscarAutenticado(""));
-        }
-
-        [Fact(DisplayName = "Validação de listagem de usuários")]
-        [Trait("Categoria", "Validação Usuário")]
-        public async Task List_ShouldReturnList()
-        {
-            var usuario = new UsuarioListarResposta
+        {     
+            var usuario = new UsuarioBuscarAutenticadoResposta
             {
                 Email = "ju.hernandesmh@gmail.com",
-                Nome = "Juliana",
-                NivelAcesso = "Admin"
+                Nome = "Juliana"
             };
-            _usuarioRepository.Setup(l => l.ListarUsuario()).ReturnsAsync(new List<UsuarioListarResposta> { usuario });
+
+            _usuarioRepository
+                .Setup(f => f.BuscarUsuarioPorEmail(usuario.Email))
+                .ReturnsAsync((UsuarioBuscarAutenticadoResposta?)null);
+
+            await Assert.ThrowsAsync<ExcepetionUsuarioNaoEncontrado>(() => _serviceUsuario.BuscarAutenticado(usuario.Email));
+
+            _usuarioRepository.Verify(repo => repo.BuscarUsuarioPorEmail(usuario.Email), Times.Once);
+        }
+
+        [Fact(DisplayName = "Listar Usuários - Sucesso total")]
+        [Trait("Categoria", "Listagem")]
+        public async Task List_ShouldReturnList()
+        {
+            List<UsuarioListarResposta> retorno = [
+                new() {Id = 1, Nome="Marcos", Email= "marcos@gmail.com",NivelAcesso = "Admin"},
+                new() {Id = 2, Nome="Juliana", Email= "juliana@gmail.com",NivelAcesso = "Admin"},
+                new() {Id = 3, Nome="Murilo", Email= "murilo@gmail.com",NivelAcesso = "Usuário"},
+                new() {Id = 4, Nome="Jose", Email= "jose@gmail.com",NivelAcesso = "Usuário"}
+            ];
+
+            _usuarioRepository
+                .Setup(l => l.ListarUsuario())
+                .ReturnsAsync(retorno);
 
             var resultado = await _serviceUsuario.Listar();
 
+            Assert.NotNull(resultado);
             Assert.True(resultado.Success);
-            Assert.Equal("Juliana", resultado.Data.FirstOrDefault().Nome);
-            Assert.Equal("ju.hernandesmh@gmail.com", resultado.Data.FirstOrDefault().Email);
-            Assert.Equal("Admin", resultado.Data.FirstOrDefault().NivelAcesso);
+            Assert.NotNull(resultado.Data);
+            Assert.Equal(4, resultado.Data.Count);
+
+            _usuarioRepository.Verify(r => r.ListarUsuario(), Times.Once);
         }
 
-        [Fact(DisplayName = "Validação de listagem de usuário com filtro nome")]
-        [Trait("Categoria", "Validação Usuário")]
+        [Fact(DisplayName = "Listar Usuários - Filtragem por nome")]
+        [Trait("Categoria", "Listagem")]
         public async Task List_ShouldReturnListFilter()
         {
-            var usuario = new UsuarioListarResposta
-            {
-                Email = "ju.hernandesmh@gmail.com",
-                Nome = "Juliana",
-                NivelAcesso = "Admin"
-            };
+            List<UsuarioListarResposta> retorno = [
+                new() {Id = 1, Nome="Marcos", Email= "marcos@gmail.com",NivelAcesso = "Admin"},
+                new() {Id = 2, Nome="Juliana", Email= "juliana@gmail.com",NivelAcesso = "Admin"},
+                new() {Id = 3, Nome="Murilo", Email= "murilo@gmail.com",NivelAcesso = "Usuário"},
+                new() {Id = 4, Nome="Jose", Email= "jose@gmail.com",NivelAcesso = "Usuário"},
+                new() {Id = 5, Nome="Juliana", Email= "juliana2@gmail.com",NivelAcesso = "Usuário"},
+            ];
 
-            _usuarioRepository.Setup(l => l.ListarUsuario()).ReturnsAsync(new List<UsuarioListarResposta> { usuario });
+            _usuarioRepository
+                .Setup(l => l.ListarUsuario())
+                .ReturnsAsync(retorno);
 
-            var resultado = await _serviceUsuario.Listar("Juliana");
-
+            var resultado = await _serviceUsuario.Listar("juliana");
+            
+            Assert.NotNull(resultado);
             Assert.True(resultado.Success);
-            Assert.Equal("Juliana", resultado.Data.FirstOrDefault().Nome);
+            Assert.NotNull(resultado.Data);
+
+            Assert.All(resultado.Data, u => Assert.Equal("Juliana", u.Nome));
+            Assert.Equal(2, resultado.Data.Count);
+
+            _usuarioRepository.Verify(r => r.ListarUsuario(), Times.Once);
         }
 
-        [Fact(DisplayName = "Validação de listagem de usuário com filtro email")]
-        [Trait("Categoria", "Validação Usuário")]
+        [Fact(DisplayName = "Listar Usuários - Filtragem por email")]
+        [Trait("Categoria", "Listagem")]
         public async Task List_ShouldReturnListFilterEmail()
         {
-            var usuario = new UsuarioListarResposta
-            {
-                Email = "ju.hernandesmh@gmail.com",
-                Nome = "Juliana"
-            };
+            List<UsuarioListarResposta> retorno = [
+                new() {Id = 1, Nome="Marcos", Email= "marcos@gmail.com",NivelAcesso = "Admin"},
+                new() {Id = 2, Nome="Juliana", Email= "juliana@gmail.com",NivelAcesso = "Admin"},
+                new() {Id = 3, Nome="Murilo", Email= "murilo@gmail.com",NivelAcesso = "Usuário"},
+                new() {Id = 4, Nome="Jose", Email= "jose@gmail.com",NivelAcesso = "Usuário"}
+            ];
 
-            _usuarioRepository.Setup(l => l.ListarUsuario()).ReturnsAsync(new List<UsuarioListarResposta> { usuario });
+            _usuarioRepository
+                .Setup(l => l.ListarUsuario())
+                .ReturnsAsync(retorno);
 
-            var resultado = await _serviceUsuario.Listar(null, "ju.hernandesmh@gmail.com", null);
+            var resultado = await _serviceUsuario.Listar(null, "juliana@gmail.com", null);
 
+            Assert.NotNull(resultado);
             Assert.True(resultado.Success);
-            Assert.Equal("ju.hernandesmh@gmail.com", resultado.Data.FirstOrDefault().Email);
+            Assert.NotNull(resultado.Data);
+
+            var usuarioFiltrado = Assert.Single(resultado.Data);
+            Assert.Equal(2, usuarioFiltrado.Id);
+            Assert.Equal("juliana@gmail.com", usuarioFiltrado.Email);
+            Assert.Equal("Juliana", usuarioFiltrado.Nome);
         }
 
-        [Fact(DisplayName = "Validação de listagem de usuário com filtro nível de acesso")]
-        [Trait("Categoria", "Validação Usuário")]
+        [Fact(DisplayName = "Listar Usuários - Filtragem nível de acesso")]
+        [Trait("Categoria", "Listagem")]
         public async Task List_ShouldReturnListFilterNivelAcesso()
         {
-            var usuario = new UsuarioListarResposta
-            {
-                NivelAcesso = "Admin",
-                Email = "ju.hernandesmh@gmail.com",
-                Nome = "Juliana"
-            };
+            List<UsuarioListarResposta> retorno = [
+                new() {Id = 1, Nome="Marcos", Email= "marcos@gmail.com",NivelAcesso = "Admin"},
+                new() {Id = 2, Nome="Juliana", Email= "juliana@gmail.com",NivelAcesso = "Admin"},
+                new() {Id = 3, Nome="Murilo", Email= "murilo@gmail.com",NivelAcesso = "Usuário"},
+                new() {Id = 4, Nome="Jose", Email= "jose@gmail.com",NivelAcesso = "Usuário"}
+            ];
 
-            _usuarioRepository.Setup(l => l.ListarUsuario()).ReturnsAsync(new List<UsuarioListarResposta> { usuario });
+            _usuarioRepository
+                .Setup(l => l.ListarUsuario())
+                .ReturnsAsync(retorno);
 
             var resultado = await _serviceUsuario.Listar(null, null, "Admin");
 
+
+            Assert.NotNull(resultado);
             Assert.True(resultado.Success);
-            Assert.Equal("Admin", resultado.Data.FirstOrDefault().NivelAcesso);
+            Assert.NotNull(resultado.Data);
+            Assert.Equal(2, resultado.Data.Count);
+            Assert.All(resultado.Data, u => Assert.Equal("Admin", u.NivelAcesso));
         }
 
     }

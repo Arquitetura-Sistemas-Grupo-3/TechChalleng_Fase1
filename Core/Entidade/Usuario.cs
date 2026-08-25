@@ -1,4 +1,5 @@
 ﻿using Core.Input;
+using Core.ValueObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace Core.Entidade
     {
         public string Nome { get; set; }
 
-        public string Email { get; set; }
+        public Email Email { get; set; }
 
         public string Senha { get; set; }
         public int NivelAcessoId { get; set; }
@@ -22,7 +23,7 @@ namespace Core.Entidade
         public virtual Usuario AdicionarUsuario(UsuarioAdicionarRequisicao usuario, NivelAcessoEnum nivelAcesso, string? password) {
             return new Usuario {
                 Nome = usuario.Nome,
-                Email = usuario.Email,
+                Email = new Email(usuario.Email),
                 Senha = password,
                 NivelAcessoId = (int)nivelAcesso
             };
@@ -31,7 +32,7 @@ namespace Core.Entidade
         public virtual void Atualizar(Usuario usuarioAntigo,UsuarioAtualizarRequisicao usuarioNovo, string? password)
         {
             Nome = string.IsNullOrEmpty(usuarioNovo.Nome) ? usuarioAntigo.Nome : usuarioNovo.Nome;
-            Email = string.IsNullOrEmpty(usuarioNovo.Email) ? usuarioAntigo.Email : usuarioNovo.Email;
+            Email = string.IsNullOrEmpty(usuarioNovo.Email) ? usuarioAntigo.Email : new Email(usuarioNovo.Email);
             Senha = string.IsNullOrEmpty(password) ? usuarioAntigo.Senha : password;
             NivelAcessoId = usuarioNovo.NivelAcessoId == 0 ? usuarioAntigo.NivelAcessoId : usuarioNovo.NivelAcessoId;
         }
