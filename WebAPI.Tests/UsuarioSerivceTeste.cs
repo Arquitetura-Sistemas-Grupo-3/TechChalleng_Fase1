@@ -47,7 +47,7 @@ namespace WebAPI.Tests
                     usuarioAdicionado = u;
                 });
 
-            var retorno = await _serviceUsuario.AdicionarUsuario(usuarioRequisicao, idNivelAcesso: 1);
+            var retorno = await _serviceUsuario.AdicionarUsuario(usuarioRequisicao, nivelAcesso: NivelAcessoEnum.Admin);
 
             Assert.True(retorno.Success);
             Assert.Equal("Usuário adicionado com sucesso", retorno.Message);
@@ -74,7 +74,7 @@ namespace WebAPI.Tests
                 .Setup(repo => repo.ValidaEmail(usuarioRequisicao.Email))
                 .ReturnsAsync(new Usuario());
 
-            await Assert.ThrowsAsync<ExceptionEmailCadastrado>(() => _serviceUsuario.AdicionarUsuario(usuarioRequisicao, idNivelAcesso: 1));
+            await Assert.ThrowsAsync<ExceptionEmailCadastrado>(() => _serviceUsuario.AdicionarUsuario(usuarioRequisicao, nivelAcesso: NivelAcessoEnum.Admin));
 
             // Garante que o Add nunca foi chamado nesse cenário
             _usuarioRepository.Verify(r => r.Add(It.IsAny<Usuario>()), Times.Never);
@@ -98,7 +98,7 @@ namespace WebAPI.Tests
                 .ReturnsAsync((Usuario)null);
 
 
-            await Assert.ThrowsAsync<ExceptionSenhaInvalida>(() => _serviceUsuario.AdicionarUsuario(usuarioRequisicao, idNivelAcesso: 1));
+            await Assert.ThrowsAsync<ExceptionSenhaInvalida>(() => _serviceUsuario.AdicionarUsuario(usuarioRequisicao, nivelAcesso: NivelAcessoEnum.Admin));
 
             _usuarioRepository.Verify(r => r.Add(It.IsAny<Usuario>()), Times.Never);
         }
