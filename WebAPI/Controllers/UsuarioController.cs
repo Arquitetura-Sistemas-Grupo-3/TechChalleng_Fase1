@@ -1,4 +1,4 @@
-﻿using Core.Entidade;
+﻿using Core.Entidade.Enums;
 using Core.Input;
 using Core.Output;
 using Infra.Repository;
@@ -93,11 +93,22 @@ namespace WebAPI.Controllers
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(ServiceResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        [Authorize(Policy = "Admin")]
+        [Authorize]
         public async Task<IActionResult> Atualizar([FromBody] UsuarioAtualizarRequisicao usuarioUpdate, [FromRoute] int id)
         {
-            var usuario = await _usuarioService.AtualizarUsuario(usuarioUpdate, id);
-            return Ok(usuario);
+            ServiceResponse reposta;
+            NivelAcessoEnum acesso = User.FindFirst(ClaimTypes.Role)?.Value == "Usuário" ? NivelAcessoEnum.Usuario : NivelAcessoEnum.Admin;
+
+            if (acesso == NivelAcessoEnum.Usuario)
+            {
+                var usuario = await _usuarioService.BuscarAutenticado(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+                reposta = await _usuarioService.AtualizarUsuario(usuarioUpdate, usuario.Data.Id);
+            }
+            else
+                reposta = await _usuarioService.AtualizarUsuario(usuarioUpdate, id);
+
+            return Ok(reposta);
         }
 
         /// <summary>

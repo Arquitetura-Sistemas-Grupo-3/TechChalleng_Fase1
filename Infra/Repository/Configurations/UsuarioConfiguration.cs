@@ -1,4 +1,5 @@
 ﻿using Core.Entidade;
+using Core.Entidade.Enums;
 using Core.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

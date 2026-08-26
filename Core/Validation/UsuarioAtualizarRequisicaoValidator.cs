@@ -24,10 +24,6 @@ namespace Core.Validation {
                     .Matches(@"[\W_]").WithMessage("A senha deve conter ao menos um caractere especial.");
             });
 
-            When(x => x.NivelAcessoId != 0, () => {
-                RuleFor(x => x.NivelAcessoId)
-                    .GreaterThan(0).WithMessage("O nível de acesso é obrigatório.");
-            });
         }
     }
 }
