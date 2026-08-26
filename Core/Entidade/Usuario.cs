@@ -1,4 +1,5 @@
-﻿using Core.Input;
+﻿using Core.Entidade.Enums;
+using Core.Input;
 using Core.ValueObjects;
 using System;
 using System.Collections.Generic;
@@ -34,7 +35,6 @@ namespace Core.Entidade
             Nome = string.IsNullOrEmpty(usuarioNovo.Nome) ? usuarioAntigo.Nome : usuarioNovo.Nome;
             Email = string.IsNullOrEmpty(usuarioNovo.Email) ? usuarioAntigo.Email : new Email(usuarioNovo.Email);
             Senha = string.IsNullOrEmpty(password) ? usuarioAntigo.Senha : password;
-            NivelAcessoId = usuarioNovo.NivelAcessoId == 0 ? usuarioAntigo.NivelAcessoId : usuarioNovo.NivelAcessoId;
         }
     }
 }

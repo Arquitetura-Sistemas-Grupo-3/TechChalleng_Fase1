@@ -1,4 +1,5 @@
 ﻿using Core.Entidade;
+using Core.Entidade.Enums;
 using Core.Input;
 using Core.Output;
 using Core.ValueObjects;
@@ -112,7 +113,6 @@ namespace WebAPI.Tests
             {
                 Email = "ju.menezes@gmail.com",
                 Senha = "123",
-                NivelAcessoId = 1,
                 Nome = "Juli"
             };
 

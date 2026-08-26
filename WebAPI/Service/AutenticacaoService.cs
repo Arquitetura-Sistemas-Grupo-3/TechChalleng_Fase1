@@ -9,6 +9,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using WebAPI.Interface;
+using Core.Entidade.Enums;
 
 namespace WebAPI.Service
 {

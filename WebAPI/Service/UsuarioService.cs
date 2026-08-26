@@ -1,10 +1,12 @@
-﻿using BC = BCrypt.Net.BCrypt;
-using Core.Entidade;
+﻿using Core.Entidade;
+using Core.Entidade.Enums;
 using Core.Input;
-using Infra.Repository;
-using WebAPI.Interface;
-using Infra.Exceptions;
 using Core.Output;
+using Infra.Exceptions;
+using Infra.Repository;
+using System.Security.Claims;
+using WebAPI.Interface;
+using BC = BCrypt.Net.BCrypt;
 
 namespace WebAPI.Service
 {

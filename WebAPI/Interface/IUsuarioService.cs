@@ -1,4 +1,4 @@
-﻿using Core.Entidade;
+﻿using Core.Entidade.Enums;
 using Core.Input;
 using Core.Output;
 
