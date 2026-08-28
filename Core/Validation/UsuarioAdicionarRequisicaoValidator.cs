@@ -2,8 +2,8 @@
 using FluentValidation;
 
 namespace Core.Validation {
-    public class UsuarioInputValidator : AbstractValidator<UsuarioInput> {
-        public UsuarioInputValidator() {
+    public class UsuarioAdicionarRequisicaoValidator : AbstractValidator<UsuarioAdicionarRequisicao> {
+        public UsuarioAdicionarRequisicaoValidator() {
             RuleFor(x => x.Nome)
                 .NotEmpty().WithMessage("O nome é obrigatório.");
 
@@ -18,9 +18,6 @@ namespace Core.Validation {
                 .Matches(@"[a-z]").WithMessage("A senha deve conter ao menos uma letra minúscula.")
                 .Matches(@"[0-9]").WithMessage("A senha deve conter ao menos um número.")
                 .Matches(@"[\W_]").WithMessage("A senha deve conter ao menos um caractere especial.");
-
-            RuleFor(x => x.NivelAcessoId)
-                .GreaterThan(0).WithMessage("O nível de acesso é obrigatório.");
         }
     }
 }

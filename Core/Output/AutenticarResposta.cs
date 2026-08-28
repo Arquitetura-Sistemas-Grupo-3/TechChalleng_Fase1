@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Core.Output
 {
-    public class AuthReturn
+    public class AutenticarResposta
     {
         public string NomeUsuario { get; set; }
         public string Token { get; set; }

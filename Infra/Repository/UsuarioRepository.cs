@@ -1,6 +1,7 @@
 ﻿using Core.Entidade;
 using Core.Input;
 using Core.Output;
+using Core.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -18,23 +19,44 @@ namespace Infra.Repository
 
         public async Task<Usuario?> ValidaEmailSenha(string email)
         {
-            return await _dbSet.FirstOrDefaultAsync(u => u.Email == email);
+            if (!Email.TentarCriar(email, out var emailVo)) return null;
+
+            return await _dbSet.FirstOrDefaultAsync(u => u.Email == emailVo && u.Ativo);
         }
 
-        public async Task<List<UsuarioReturn>> GetAllUsuario()
+        public async Task<Usuario?> ValidaEmail(string email)
+        {
+            if (!Email.TentarCriar(email, out var emailVo)) return null;
+
+            return await _dbSet.FirstOrDefaultAsync(u => u.Email == emailVo);
+        }
+
+        public async Task<List<UsuarioListarResposta>> ListarUsuario()
         {
             return await _dbSet
                 .Include(u => u.NivelAcesso)
-                .Select(u => new UsuarioReturn { Id= u.Id, Nome = u.Nome, Email =u.Email,DataCriacao = u.Data, NivelAcesso = u.NivelAcesso.Nome })
+                .Where(u => u.Ativo)
+                .Select(u => new UsuarioListarResposta { Id= u.Id, Nome = u.Nome, Email = u.Email.Endereco,DataCriacao = u.Data, NivelAcesso = u.NivelAcesso.Nome })
                 .ToListAsync();
-              
+
         }
 
-        public async Task<UsuarioReturn?> GetUsuarioById(int id)
+        public async Task<UsuarioBuscarPorIdResposta?> BuscarUsuarioPorId(int id)
         {
             return await _dbSet
-                .Select(u => new UsuarioReturn { Id = u.Id, Nome = u.Nome, Email = u.Email, DataCriacao = u.Data, NivelAcesso = u.NivelAcesso.Nome })
+                .Where(u => u.Ativo)
+                .Select(u => new UsuarioBuscarPorIdResposta { Id = u.Id, Nome = u.Nome, Email = u.Email.Endereco, DataCriacao = u.Data, NivelAcesso = u.NivelAcesso.Nome })
                 .FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        public async Task<UsuarioBuscarAutenticadoResposta?> BuscarUsuarioPorEmail(string email)
+        {
+            if (!Email.TentarCriar(email, out var emailVo)) return null;
+
+            return await _dbSet
+                .Where(u => u.Email == emailVo)
+                .Select(u => new UsuarioBuscarAutenticadoResposta { Id = u.Id, Nome = u.Nome, Email = u.Email.Endereco, DataCriacao = u.Data, NivelAcesso = u.NivelAcesso.Nome })
+                .FirstOrDefaultAsync();
         }
     }
 }

@@ -9,45 +9,51 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using WebAPI.Interface;
+using Core.Entidade.Enums;
 
 namespace WebAPI.Service
 {
-    public class AuthService : IAuthService
+    public class AutenticacaoService : IAuthService
     {
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly INivelAcessoRepository _nivelAcessoRepository;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<AutenticacaoService> _logger;
 
-        public AuthService(IUsuarioRepository usuarioRepository, INivelAcessoRepository nivelAcessoRepository, IConfiguration configuration)
+        public AutenticacaoService(IUsuarioRepository usuarioRepository, INivelAcessoRepository nivelAcessoRepository, IConfiguration configuration, ILogger<AutenticacaoService> logger)
         {
             _usuarioRepository = usuarioRepository;
             _nivelAcessoRepository = nivelAcessoRepository;
             _configuration = configuration;
+            _logger = logger;
         }
 
-        public async Task<AuthReturn?> Login(string email, string senha)
+        public async Task<ServiceResponse<AutenticarResposta>> Autenticar(string email, string senha)
         {
+            _logger.LogInformation("Tentativa de login para {Email}", email);
 
-            Usuario? usuario = await _usuarioRepository.ValidaEmailSenha(email);         
+            Usuario? usuario = await _usuarioRepository.ValidaEmailSenha(email);
 
-            if (usuario == null) return null;
-
-            if (!BC.Verify(senha, usuario.Senha)) return null;
+            if (usuario == null || !BC.Verify(senha, usuario.Senha))
+            {
+                _logger.LogWarning("Falha de autenticação para {Email}", email);
+                return ServiceResponse<AutenticarResposta>.Fail("E-mail ou senha inválidos");
+            }
 
             NivelAcesso acesso = await _nivelAcessoRepository.GetById(usuario.NivelAcessoId);
 
+            var nivelEnum = (NivelAcessoEnum)usuario.NivelAcessoId;
+            string jwt = GerarJWT(usuario.Email.Endereco, acesso.Nome);
 
-            string jwt = GerarJWT(usuario.Email, acesso.Nome);
-
-
-            AuthReturn auth = new AuthReturn
+            AutenticarResposta auth = new AutenticarResposta
             {
                 NomeUsuario = usuario.Nome,
                 Token = jwt
             };
 
+            _logger.LogInformation("Login realizado com sucesso para {Email}", email);
 
-            return auth;
+            return ServiceResponse<AutenticarResposta>.Ok(auth);
         }
 
         private string GerarJWT(string username, string role)
