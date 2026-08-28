@@ -5,6 +5,6 @@ namespace WebAPI.Interface
 {
     public interface IAuthService
     {
-        Task<ServiceResponse<AutenticarResposta>> Autenticar(string email, string password);
+        Task<ServiceResponse<AutenticarResposta>> Autenticar(string email, string senha);
     }
 }
