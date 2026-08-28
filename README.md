@@ -83,7 +83,7 @@ O projeto segue uma organização em camadas (**Clean Architecture / Layered Arc
 
 | Método | Rota | Descrição |
 |--------|------|-----------|
-| `GET` | `/Autenticacao?email={email}&password={senha}` | Realiza login com e-mail e senha, retornando um token **JWT**. |
+| `GET` | `/Autenticacao?email={email}&senha={senha}` | Realiza login com e-mail e senha, retornando um token **JWT**. |
 
 ### 👥 Usuários — `UsuarioController`
 
@@ -91,10 +91,10 @@ O projeto segue uma organização em camadas (**Clean Architecture / Layered Arc
 |--------|------|-----------|--------|
 | `GET` | `/Usuario` | Lista usuários, com **filtros opcionais** por nome, e-mail e nível de acesso (`?nome=&email=&nivelAcesso=`). | `Admin` |
 | `GET` | `/Usuario/{id}` | Busca um usuário pelo ID. | `Admin` |
-| `GET` | `/Usuario/me` | Consulta os dados do usuário autenticado (via token JWT). | Autenticado |
-| `POST` | `/Usuario` | Cadastra um novo usuário com nível de acesso **Usuário**. | Público |
+| `GET` | `/Usuario/me` | Consulta os dados do usuário autenticado (via token JWT). | `Autenticado` |
+| `POST` | `/Usuario` | Cadastra um novo usuário com nível de acesso **Usuário**. | `Público` |
 | `POST` | `/Usuario/admin` | Cadastra um novo usuário com nível de acesso **Admin**. | `Admin` |
-| `PUT` | `/Usuario/{id}` | Atualiza os dados de um usuário existente. | `Admin` |
+| `PUT` | `/Usuario/{id}` | Atualiza os dados de um usuário existente. | `Autenticado` |
 | `DELETE` | `/Usuario/{id}` | Remove (ou inativa) um usuário. | `Admin` |
 
 ---
@@ -203,7 +203,7 @@ https://localhost:7047/swagger/index.html
 
 ## 🔓 Autenticação via Swagger
 
-1. Faça login utilizando o endpoint `GET /Autenticacao`, informando `email` e `password`.
+1. Faça login utilizando o endpoint `GET /Autenticacao`, informando `email` e `senha`.
 2. Copie o **token JWT** retornado.
 3. No Swagger, clique em **Authorize** e informe `Bearer {token}` (ou apenas o token, dependendo da configuração exibida).
 4. Utilize o token no header `Authorization: Bearer {token}` para acessar os endpoints protegidos (`Admin` ou autenticado).
