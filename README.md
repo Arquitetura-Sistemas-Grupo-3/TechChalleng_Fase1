@@ -24,6 +24,7 @@
 - [Segurança](#-segurança)
 - [Middlewares Customizados](#-middlewares-customizados)
 - [Como Executar](#-como-executar)
+- [Usuário Administrador Padrão](#-usuário-administrador-padrão)
 - [Autenticação via Swagger](#-autenticação-via-swagger)
 - [Testes](#-testes)
 - [Estrutura de Pastas](#-estrutura-de-pastas)
@@ -179,7 +180,7 @@ Via CLI, a partir da raiz do repositório:
 dotnet ef database update --project Infra --startup-project WebAPI
 ```
 
-> As migrations já incluem um *seed* com os níveis de acesso `Admin` e `Usuário`. Para cadastrar o primeiro usuário administrador, utilize o endpoint `POST /Usuario` (cria um usuário comum) e depois promova-o diretamente no banco, ou utilize um usuário `Admin` já existente para chamar `POST /Usuario/admin`.
+> As migrations já incluem um *seed* com os níveis de acesso `Admin` e `Usuário`, além de um **usuário administrador padrão** (veja a seção [Usuário Administrador Padrão](#-usuário-administrador-padrão) abaixo) — não é necessário criar um admin manualmente para começar a usar a API.
 
 **5. Execute a aplicação**
 
@@ -201,9 +202,26 @@ https://localhost:7047/swagger/index.html
 
 ---
 
+## 👤 Usuário Administrador Padrão
+
+Para facilitar o primeiro acesso, as migrations já incluem (via `HasData`) um **usuário administrador padrão**, criado automaticamente assim que o `Update-Database` (ou `dotnet ef database update`) é executado:
+
+| Campo | Valor |
+|-------|-------|
+| **Nome** | `admin` |
+| **E-mail** | `admin@gmail.com` |
+| **Senha** | `Fiap2026@` |
+| **Nível de Acesso** | `Admin` |
+
+Use essas credenciais no endpoint `GET /Autenticacao` para obter um token JWT com permissão de `Admin` e começar a explorar a API imediatamente (por exemplo, para cadastrar outros usuários `Admin` via `POST /Usuario/admin`).
+
+> ⚠️ **Atenção:** este usuário é destinado apenas a ambientes de **desenvolvimento/avaliação**. Em produção, altere a senha imediatamente (ou remova o seed) para evitar acesso indevido com uma credencial conhecida publicamente.
+
+---
+
 ## 🔓 Autenticação via Swagger
 
-1. Faça login utilizando o endpoint `GET /Autenticacao`, informando `email` e `senha`.
+1. Faça login utilizando o endpoint `GET /Autenticacao`, informando `email` e `senha` (você pode usar o [usuário administrador padrão](#-usuário-administrador-padrão) para o primeiro acesso).
 2. Copie o **token JWT** retornado.
 3. No Swagger, clique em **Authorize** e informe `Bearer {token}` (ou apenas o token, dependendo da configuração exibida).
 4. Utilize o token no header `Authorization: Bearer {token}` para acessar os endpoints protegidos (`Admin` ou autenticado).
@@ -226,7 +244,7 @@ dotnet test
 TechChallenge/
 ├── WebAPI/            # API, Controllers, Middlewares, Program.cs
 ├── Core/              # Entidades, Interfaces, Inputs/Outputs, Validações
-├── Infra/             # DbContext, Migrations, Repositórios, Exceções
+├── Infra/             # DbContext, Migrations, Repositórios e Exceções
 └── WebAPI.Tests/      # Testes automatizados
 ```
 
