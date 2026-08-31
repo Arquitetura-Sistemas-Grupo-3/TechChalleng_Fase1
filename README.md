@@ -215,8 +215,6 @@ Para facilitar o primeiro acesso, as migrations já incluem (via `HasData`) um *
 
 Use essas credenciais no endpoint `GET /Autenticacao` para obter um token JWT com permissão de `Admin` e começar a explorar a API imediatamente (por exemplo, para cadastrar outros usuários `Admin` via `POST /Usuario/admin`).
 
-> ⚠️ **Atenção:** este usuário é destinado apenas a ambientes de **desenvolvimento/avaliação**. Em produção, altere a senha imediatamente (ou remova o seed) para evitar acesso indevido com uma credencial conhecida publicamente.
-
 ---
 
 ## 🔓 Autenticação via Swagger
