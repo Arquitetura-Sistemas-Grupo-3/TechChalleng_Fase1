@@ -4,11 +4,11 @@ using FluentAssertions;
 
 namespace WebAPI.Tests
 {
-    public class UsuarioValidatorTeste
+    public class UsuarioValidacaoTeste
     {
         private UsuarioAdicionarRequisicaoValidator validation;
 
-        public UsuarioValidatorTeste()
+        public UsuarioValidacaoTeste()
         {
             validation = new UsuarioAdicionarRequisicaoValidator();
         }

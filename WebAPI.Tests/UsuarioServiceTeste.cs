@@ -12,12 +12,12 @@ using WebAPI.Service;
 
 namespace WebAPI.Tests
 {
-    public class UsuarioSerivceTeste
+    public class UsuarioServiceTeste
     {
         private readonly Mock<IUsuarioRepository> _usuarioRepository;
         private readonly Mock<ILogger<UsuarioService>> _logger;
         private readonly UsuarioService _serviceUsuario;
-        public UsuarioSerivceTeste()
+        public UsuarioServiceTeste()
         {
             _usuarioRepository = new Mock<IUsuarioRepository>();
             _logger = new Mock<ILogger<UsuarioService>>();

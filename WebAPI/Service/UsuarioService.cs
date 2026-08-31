@@ -105,12 +105,12 @@ namespace WebAPI.Service
 
             if (usuario == null) throw new ExcepetionUsuarioNaoEncontrado("Usuário não encontrado");
 
-            string? password;
+            string? senha;
 
-            if (!string.IsNullOrEmpty(usuarioUpdate.Senha)) password = BC.HashPassword(usuarioUpdate.Senha);
-            else password = null;
+            if (!string.IsNullOrEmpty(usuarioUpdate.Senha)) senha = BC.HashPassword(usuarioUpdate.Senha);
+            else senha = null;
 
-            usuario.Atualizar(usuario,usuarioUpdate, password);
+            usuario.Atualizar(usuario,usuarioUpdate, senha);
 
             _usuarioRepository.Update(usuario);
 

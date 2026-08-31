@@ -20,15 +20,15 @@
 - [Sobre o Projeto](#-sobre-o-projeto)
 - [Arquitetura](#-arquitetura)
 - [Tecnologias](#-tecnologias)
-- [Funcionalidades](#-funcionalidades)
 - [Modelo de Domínio](#-modelo-de-domínio)
 - [Segurança](#-segurança)
 - [Middlewares Customizados](#-middlewares-customizados)
 - [Como Executar](#-como-executar)
+- [Usuário Administrador Padrão](#-usuário-administrador-padrão)
 - [Autenticação via Swagger](#-autenticação-via-swagger)
 - [Testes](#-testes)
 - [Estrutura de Pastas](#-estrutura-de-pastas)
-- [Autores](#-autores)
+- [Autores](#autores)
 
 ---
 
@@ -80,24 +80,23 @@ O projeto segue uma organização em camadas (**Clean Architecture / Layered Arc
 
 ---
 
-## ⚙️ Funcionalidades
-
-### 🔑 Autenticação — `AuthController`
+### 🔑 Autenticação — `AutenticacaoController`
 
 | Método | Rota | Descrição |
 |--------|------|-----------|
-| `GET` | `/Auth` | Realiza login com e-mail e senha, retornando um token **JWT**. |
-| `GET` | `/admin` | Endpoint protegido pela política `Admin`, acessível apenas por usuários com o nível de acesso correspondente. |
+| `GET` | `/Autenticacao?email={email}&senha={senha}` | Realiza login com e-mail e senha, retornando um token **JWT**. |
 
-### 👥 Usuários — `UsuarioControler`
+### 👥 Usuários — `UsuarioController`
 
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| `GET` | `/UsuarioControler` | Lista usuários, com **filtros opcionais** por nome, e-mail e nível de acesso. |
-| `GET` | `/UsuarioControler/{id}` | Busca um usuário pelo ID. |
-| `POST` | `/UsuarioControler` | Cadastra um novo usuário. |
-| `PUT` | `/UsuarioControler/{id}` | Atualiza os dados de um usuário existente. |
-| `DELETE` | `/UsuarioControler/{id}` | Remove (ou inativa) um usuário. |
+| Método | Rota | Descrição | Acesso |
+|--------|------|-----------|--------|
+| `GET` | `/Usuario` | Lista usuários, com **filtros opcionais** por nome, e-mail e nível de acesso (`?nome=&email=&nivelAcesso=`). | `Admin` |
+| `GET` | `/Usuario/{id}` | Busca um usuário pelo ID. | `Admin` |
+| `GET` | `/Usuario/me` | Consulta os dados do usuário autenticado (via token JWT). | `Autenticado` |
+| `POST` | `/Usuario` | Cadastra um novo usuário com nível de acesso **Usuário**. | `Público` |
+| `POST` | `/Usuario/admin` | Cadastra um novo usuário com nível de acesso **Admin**. | `Admin` |
+| `PUT` | `/Usuario/{id}` | Atualiza os dados de um usuário existente. | `Autenticado` |
+| `DELETE` | `/Usuario/{id}` | Remove (ou inativa) um usuário. | `Admin` |
 
 ---
 
@@ -136,7 +135,8 @@ O projeto segue uma organização em camadas (**Clean Architecture / Layered Arc
 ### Pré-requisitos
 
 - [.NET 8 SDK](https://dotnet.microsoft.com/download)
-- SQL Server (local ou container)
+- SQL Server (local, remoto ou container)
+- [EF Core Tools](https://learn.microsoft.com/ef/core/cli/dotnet) (`dotnet tool install --global dotnet-ef`), necessário apenas se for aplicar as migrations via linha de comando.
 
 ### Passo a passo
 
@@ -155,7 +155,9 @@ cd TechChalleng_Fase1
 }
 ```
 
-**3. Configure as chaves do JWT** em `appsettings.json`
+> ℹ️ O banco de dados informado em `Database=` será criado automaticamente ao aplicar as migrations, não é necessário criá-lo manualmente.
+
+**3. Configure as chaves do JWT** em `appsettings.json` (opcional — o repositório já traz valores padrão para ambiente de desenvolvimento)
 
 ```json
 "Jwt": {
@@ -166,11 +168,25 @@ cd TechChalleng_Fase1
 
 **4. Aplique as migrations**
 
-```bash
-update-database
+Via Visual Studio (Package Manager Console, com o projeto `Infra` selecionado como *Default project*):
+
+```powershell
+Update-Database
 ```
 
+Via CLI, a partir da raiz do repositório:
+
+```bash
+dotnet ef database update --project Infra --startup-project WebAPI
+```
+
+> As migrations já incluem um *seed* com os níveis de acesso `Admin` e `Usuário`, além de um **usuário administrador padrão** (veja a seção [Usuário Administrador Padrão](#-usuário-administrador-padrão) abaixo) — não é necessário criar um admin manualmente para começar a usar a API.
+
 **5. Execute a aplicação**
+
+Via Visual Studio: defina `WebAPI` como projeto de inicialização e pressione `F5` (ou `Ctrl+F5`).
+
+Via CLI:
 
 ```bash
 dotnet run --project WebAPI
@@ -182,13 +198,33 @@ dotnet run --project WebAPI
 https://localhost:7047/swagger/index.html
 ```
 
+> A porta pode variar conforme o perfil de execução utilizado (`https`, `http` ou `IIS Express`), definido em `WebAPI/Properties/launchSettings.json`. Ao rodar via `dotnet run`, o console exibirá a URL correta.
+
+---
+
+## 👤 Usuário Administrador Padrão
+
+Para facilitar o primeiro acesso, as migrations já incluem (via `HasData`) um **usuário administrador padrão**, criado automaticamente assim que o `Update-Database` (ou `dotnet ef database update`) é executado:
+
+| Campo | Valor |
+|-------|-------|
+| **Nome** | `admin` |
+| **E-mail** | `admin@gmail.com` |
+| **Senha** | `Fiap2026@` |
+| **Nível de Acesso** | `Admin` |
+
+Use essas credenciais no endpoint `GET /Autenticacao` para obter um token JWT com permissão de `Admin` e começar a explorar a API imediatamente (por exemplo, para cadastrar outros usuários `Admin` via `POST /Usuario/admin`).
+
+> ⚠️ **Atenção:** este usuário é destinado apenas a ambientes de **desenvolvimento/avaliação**. Em produção, altere a senha imediatamente (ou remova o seed) para evitar acesso indevido com uma credencial conhecida publicamente.
+
 ---
 
 ## 🔓 Autenticação via Swagger
 
-1. Faça login utilizando o endpoint `GET /Auth`, informando `email` e `password`.
+1. Faça login utilizando o endpoint `GET /Autenticacao`, informando `email` e `senha` (você pode usar o [usuário administrador padrão](#-usuário-administrador-padrão) para o primeiro acesso).
 2. Copie o **token JWT** retornado.
-3. Utilize o token no header `Authorization: Bearer {token}` para acessar os endpoints protegidos.
+3. No Swagger, clique em **Authorize** e informe `Bearer {token}` (ou apenas o token, dependendo da configuração exibida).
+4. Utilize o token no header `Authorization: Bearer {token}` para acessar os endpoints protegidos (`Admin` ou autenticado).
 
 ---
 
@@ -208,13 +244,14 @@ dotnet test
 TechChallenge/
 ├── WebAPI/            # API, Controllers, Middlewares, Program.cs
 ├── Core/              # Entidades, Interfaces, Inputs/Outputs, Validações
-├── Infra/             # DbContext, Migrations, Repositórios, Exceções
+├── Infra/             # DbContext, Migrations, Repositórios e Exceções
 └── WebAPI.Tests/      # Testes automatizados
 ```
 
 ---
 
-## 👨‍💻 Autores
+<a name="autores"></a>
+## Autores
 
 | Nome |
 |------|
@@ -224,7 +261,3 @@ TechChallenge/
 | Murilo dos Santos Cantante |
 
 ---
-
-<p align="center">
-  Desenvolvido com 💜 para o <strong>Tech Challenge — FIAP Pós Tech</strong>
-</p>
